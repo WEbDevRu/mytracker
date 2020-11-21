@@ -3,8 +3,51 @@ const router = express.Router();
 
 router.get('/', ((req, res, next) => {
     res.status(200).json({
-        message: "Get запрос выполнен",
-        userId: '1'
+       items: [
+           {
+               iconUrl: "https://nikrainev.ru/1img/profile.svg",
+               country: 'Россия',
+               time: '400',
+               date: 'сегодня в 21:22',
+               income: '0$'
+           },
+           {
+               iconUrl: "https://nikrainev.ru/1img/profile.svg",
+               country: 'Сша',
+               time: '400',
+               date: 'сегодня в 21:22',
+               income: '0$'
+           },
+           {
+               iconUrl: "https://nikrainev.ru/1img/profile.svg",
+               country: 'США',
+               time: '400',
+               date: 'сегодня в 21:22',
+               income: '0$'
+           },
+           {
+               iconUrl: "https://nikrainev.ru/1img/profile.svg",
+               country: 'РОССИЯ',
+               time: '400',
+               date: 'сегодня в 21:22',
+               income: '0$'
+           },
+           {
+               iconUrl: "https://nikrainev.ru/1img/profile.svg",
+               country: 'РОССИЯ',
+               time: '400',
+               date: 'сегодня в 21:22',
+               income: '0$'
+           },
+           {
+               iconUrl: "https://nikrainev.ru/1img/profile.svg",
+               country: 'Франция',
+               time: '400',
+               date: 'сегодня в 21:22',
+               income: '0$'
+           }
+
+       ]
     });
 }))
 
