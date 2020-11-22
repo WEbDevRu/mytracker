@@ -10,7 +10,7 @@ app.use(morgan('dev'))
 app.use('/users',usersRoutes)
 app.use('/counters',countersRoutes)
 
-app.use(((req, res, next) => {
+app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin","*")
     res.header(
         "Access-Control-Allow-Headers",
@@ -22,9 +22,11 @@ app.use(((req, res, next) => {
     }
     next();
 
-}))
+})
+
 
 app.use((req, res , next) => {
+
     const error = new Error('Not found');
     error.status = 404;
     next(error);
