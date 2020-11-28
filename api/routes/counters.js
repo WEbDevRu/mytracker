@@ -12,7 +12,7 @@ router.get('/',  (async (req, res, next) => {
         .exec()
         .then(docs =>{
             res.status(200).json({
-                    items:[docs],
+                    items: docs,
                     totalPages: count,
                     currentPage: page
 
