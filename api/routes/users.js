@@ -1,83 +1,62 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose')
+const User = require('../models/users');
 
-router.get('/', ((req, res, next) => {
+router.get('/', (async (req, res, next) => {
+    const { page = 1, limit = 5 } = req.query
+    const count = await User.countDocuments();
+    User
+        .find()
+        .limit(limit * 1)
+        .skip((page - 1) * limit)
+        .exec()
+        .then(docs =>{
+            res.status(200).json({
+                items: docs,
+                totalPages: count,
+                currentPage: page
 
-    res.status(200).json({
-       items: [
-           {
-               iconUrl: "https://nikrainev.ru/1img/profile.svg",
-               country: 'Россия',
-               time: '400',
-               date: 'сегодня в 21:22',
-               income: '0$'
-           },
-           {
-               iconUrl: "https://nikrainev.ru/1img/profile.svg",
-               country: 'Сша',
-               time: '400',
-               date: 'сегодня в 21:22',
-               income: '0$'
-           },
-           {
-               iconUrl: "https://nikrainev.ru/1img/profile.svg",
-               country: 'США',
-               time: '400',
-               date: 'сегодня в 21:22',
-               income: '0$'
-           },
-           {
-               iconUrl: "https://nikrainev.ru/1img/profile.svg",
-               country: 'РОССИЯ',
-               time: '400',
-               date: 'сегодня в 21:22',
-               income: '0$'
-           },
-           {
-               iconUrl: "https://nikrainev.ru/1img/profile.svg",
-               country: 'РОССИЯ',
-               time: '400',
-               date: 'сегодня в 21:22',
-               income: '0$'
-           },
-           {
-               iconUrl: "https://nikrainev.ru/1img/profile.svg",
-               country: 'Франция',
-               time: '400',
-               date: 'сегодня в 21:22',
-               income: '0$'
-           }
-
-       ]
-    });
+            })
+        })
+        .catch()
 }))
 
-router.post('/', (req, res, next) => {
-    const user = {
-        userId: req.body.userId,
-        userTime: req.body.userTime
-    }
-    res.status(201).json({
-        message: "POST запрос выполнен",
-        newUser: user
-    });
-})
 
 router.get('/:userId', ((req, res, next) => {
     const id = req.params.userId
-    if (id == 'nikita'){
-        res.status(200).json({
-            message: "Вы админ",
-            userId: id
-        });
-    }
-    else if(id < 1000){
-        res.status(200).json({
-            message: "Вы обычный пользователь",
-            userId: id
-        });
-    }
+    User.findById(id)
+        .exec()
+        .then(doc =>{
+            console.log(doc)
+            res.status(200).json(doc)
+        })
+        .catch(err =>{
+            console.log(err)
+            res.status(503).json(err)
+        })
 
 }))
+
+
+router.post('/', (req, res, next) => {
+    const user = new User(
+        {
+            _id:  mongoose.Types.ObjectId(),
+            imgurl: req.body.imgurl,
+            name: req.body.name,
+            country: req.body.country,
+            time: req.body.time,
+            date: new Date(),
+            revenue: req.body.revenue
+        })
+    user.save().then(result =>{
+        console.log(result)
+    }).catch(err => console.log(err))
+    res.status(200).json({
+        message: "POST запрос к счётчикам",
+        newUser: user
+    });
+})
 
 module.exports = router

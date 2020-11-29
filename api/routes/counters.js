@@ -25,7 +25,6 @@ router.post('/', ((req, res, next) => {
     const counter = new Counter(
         {
             _id:  mongoose.Types.ObjectId(),
-            imgUrl: req.body.imgUrl,
             name: req.body.name,
             domen: req.body.domen,
             dayusers: req.body.dayusers,
