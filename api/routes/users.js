@@ -10,6 +10,7 @@ router.get('/', (async (req, res, next) => {
         .find()
         .limit(limit * 1)
         .skip((page - 1) * limit)
+        .sort({_id:-1})
         .exec()
         .then(docs =>{
             res.status(200).json({
