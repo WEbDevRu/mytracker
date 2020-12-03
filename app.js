@@ -5,17 +5,6 @@ const mongoose =require('mongoose')
 const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
-const usersRoutes = require('./api/routes/users')
-const countersRoutes = require('./api/routes/counters')
-app.use(morgan('dev'))
-app.use('/users',usersRoutes)
-app.use('/counters',countersRoutes)
-
-mongoose.connect(
-    'mongodb+srv://nikrainev:wa46067820@cluster0.drt1e.mongodb.net/Cluster0?retryWrites=true&w=majority',
-{
-useMongoClient: true
-})
 
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin","*")
@@ -30,6 +19,19 @@ app.use((req, res, next) => {
     next();
 
 })
+const usersRoutes = require('./api/routes/users')
+const countersRoutes = require('./api/routes/counters')
+app.use(morgan('dev'))
+app.use('/users',usersRoutes)
+app.use('/counters',countersRoutes)
+
+mongoose.connect(
+    'mongodb+srv://nikrainev:wa46067820@cluster0.drt1e.mongodb.net/Cluster0?retryWrites=true&w=majority',
+{
+useMongoClient: true
+})
+
+
 
 
 app.use((req, res , next) => {
