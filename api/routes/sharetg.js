@@ -64,8 +64,8 @@ router.post('/', (async (req, res, next) => {
             directoryName: count
         })
     fs.mkdirSync(count.toString())
-    fs.openSync("../../../var/www/html/"+count+"/index.html",'w')
-    fs.appendFileSync("../../../var/www/html/"+count+"/index.html","<!DOCTYPE html> <html lang=\"en\"> <head> <meta charset=\"UTF-8\"> " +
+    fs.openSync("/var/www/html/"+count+"/index.html",'w')
+    fs.appendFileSync("/var/www/html/"+count+"/index.html","<!DOCTYPE html> <html lang=\"en\"> <head> <meta charset=\"UTF-8\"> " +
         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"> " +
         "<title>Document</title> </head> <body> <a download href='" + req.body.fileURL +
         "'>Ссылка</a></body> </html>")
