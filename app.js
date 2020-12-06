@@ -21,9 +21,12 @@ app.use((req, res, next) => {
 })
 const usersRoutes = require('./api/routes/users')
 const countersRoutes = require('./api/routes/counters')
+const sharetgRoutes = require('./api/routes/sharetg')
 app.use(morgan('dev'))
 app.use('/users',usersRoutes)
 app.use('/counters',countersRoutes)
+app.use('/sharetg', sharetgRoutes)
+
 
 mongoose.connect(
     'mongodb+srv://nikrainev:wa46067820@cluster0.drt1e.mongodb.net/Cluster0?retryWrites=true&w=majority',
