@@ -60,6 +60,7 @@ router.post('/', (async (req, res, next) => {
             userName: req.body.userName,
             fileName: req.body.fileName,
             fileURL: req.body.fileURL,
+            nativeFileName: req.body.nativeFileName,
             isLoaded: true,
             directoryName: count
         })

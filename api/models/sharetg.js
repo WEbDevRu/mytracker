@@ -5,6 +5,7 @@ const shareScheme = new mongoose.Schema({
     userName: String,
     fileName: String,
     fileURL: String,
+    nativeFileName: String,
     directoryName: String,
     isLoaded: Boolean
 })
