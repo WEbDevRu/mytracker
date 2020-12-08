@@ -21,10 +21,12 @@ app.use((req, res, next) => {
 })
 const usersRoutes = require('./api/routes/users')
 const countersRoutes = require('./api/routes/counters')
+const profileRoutes = require('./api/routes/profile')
 const sharetgRoutes = require('./api/routes/sharetg')
 app.use(morgan('dev'))
 app.use('/users',usersRoutes)
 app.use('/counters',countersRoutes)
+app.use('/auth',profileRoutes)
 app.use('/sharetg', sharetgRoutes)
 
 

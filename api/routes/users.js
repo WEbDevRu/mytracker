@@ -3,6 +3,8 @@ const router = express.Router();
 const mongoose = require('mongoose')
 const User = require('../models/users');
 
+
+
 router.get('/', (async (req, res, next) => {
     const { page = 1, limit = 5 } = req.query
     const count = await User.countDocuments();
@@ -29,7 +31,7 @@ router.get('/:userId', ((req, res, next) => {
     User.findById(id)
         .exec()
         .then(doc =>{
-            console.log(doc)
+
             res.status(200).json(doc)
         })
         .catch(err =>{
