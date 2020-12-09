@@ -4,18 +4,31 @@ const mongoose = require('mongoose');
 const bcrypt =require('bcrypt')
 const jwt = require('jsonwebtoken')
 const Profile = require('../models/profile');
+const checkAuth = require('../middleware/check-auth')
 
 router.post('/signup', (req,res,next) =>{
 
-    Profile.find({email: req.body.email})
+    Profile.find().or([{'email': req.body.email},{'login': req.body.login}])
         .exec()
         .then(user =>{
             if(user.length >= 1){
-                return res.status(409).json({
-                    message: "Mail exists"
-                })
+                console.log('1')
+                for(let i = 0; i <= user.length+1; i++){
+
+                    if(user[i].email == req.body.email){
+                        return res.status(409).json({
+                            message: "Mail exists"
+                        })
+                    }
+                    else if (user[i].login == req.body.login){
+                        return res.status(409).json({
+                            message: "Login exists"
+                        })
+                    }
+                }
 
             }
+
             else{
                 bcrypt.hash(req.body.password, 10, (err,hash)=>{
                     if(err){
@@ -27,6 +40,8 @@ router.post('/signup', (req,res,next) =>{
                         const profile = new Profile({
                             _id: mongoose.Types.ObjectId(),
                             email: req.body.email,
+                            login: req.body.login,
+                            regDate: new Date(),
                             password: hash
                         })
                         profile
@@ -86,5 +101,26 @@ router.post("/login", (req, res, next) => {
             })
         })
 })
+
+
+router.get("/me", checkAuth, (req,res)=>{
+    Profile
+        .findOne({email:'nikrainev@gmail.com'})
+        .limit(1)
+        .sort({_id:-1})
+        .exec()
+        .then(docs =>{
+            res.status(200).json({
+                userId: docs._id,
+                email: docs.email,
+                login: docs.login,
+                regDate: docs.regDate
+
+            })
+        })
+
+})
+
+
 
 module.exports = router
