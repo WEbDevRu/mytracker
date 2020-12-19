@@ -1,0 +1,14 @@
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="402" width="582" y="-1" x="-1"/>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <polygon fill="#ede6da" points="330.7,6 87.9,6 87.9,506 449.2,506 449.2,122.8   " id="XMLID_77_" class="st0"/>
+  <polygon fill="#837d6e" points="330.7,6 449.2,122.8 330.7,122.8   " id="XMLID_76_" class="st1"/>
+  <rect fill="#837d6e" y="298.8" x="62.8" width="329" id="XMLID_75_" height="156.1" class="st1"/>
+  <polygon fill="#514a3d" points="62.8,454.9 87.9,476.1 87.9,454.9   " id="XMLID_74_" class="st2"/>
+ </g>
+</svg>
