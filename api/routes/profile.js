@@ -105,7 +105,7 @@ router.post("/login", (req, res, next) => {
 
 router.get("/me", checkAuth, (req,res)=>{
     Profile
-        .findOne({email:'nikrainev@gmail.com'})
+        .findOne({email:req.userData.email})
         .limit(1)
         .sort({_id:-1})
         .exec()
@@ -114,7 +114,8 @@ router.get("/me", checkAuth, (req,res)=>{
                 userId: docs._id,
                 email: docs.email,
                 login: docs.login,
-                regDate: docs.regDate
+                regDate: docs.regDate,
+
 
             })
         })
