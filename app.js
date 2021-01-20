@@ -23,12 +23,13 @@ const usersRoutes = require('./api/routes/users')
 const countersRoutes = require('./api/routes/counters')
 const profileRoutes = require('./api/routes/profile')
 const sharetgRoutes = require('./api/routes/sharetg')
+const profileInfoRoutes = require('./api/routes/profileInfo/profileInfo')
 app.use(morgan('dev'))
 app.use('/users',usersRoutes)
 app.use('/counters',countersRoutes)
 app.use('/auth',profileRoutes)
 app.use('/sharetg', sharetgRoutes)
-
+app.use('/profile', profileInfoRoutes)
 
 mongoose.connect(
     'mongodb+srv://nikrainev:wa46067820@cluster0.drt1e.mongodb.net/Cluster0?retryWrites=true&w=majority',

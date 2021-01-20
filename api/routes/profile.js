@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bcrypt =require('bcrypt')
 const jwt = require('jsonwebtoken')
 const Profile = require('../models/profile');
+const ProfileInfo = require('../models/profileInfo/profileInfo');
 const checkAuth = require('../middleware/check-auth')
 
 router.post('/signup', (req,res,next) =>{
@@ -37,15 +38,26 @@ router.post('/signup', (req,res,next) =>{
                         });
                     }
                     else{
+                        const userId = mongoose.Types.ObjectId();
                         const profile = new Profile({
-                            _id: mongoose.Types.ObjectId(),
+                            _id: userId,
                             email: req.body.email,
                             login: req.body.login,
                             regDate: new Date(),
                             password: hash
                         })
+                        const newProfileInfo = new ProfileInfo(
+                            {
+                                _id: userId,
+                                name: "",
+                                soName: "",
+                                company: "",
+                                description: ""
+
+                            })
                         profile
                             .save()
+                        newProfileInfo.save()
                             .then(result =>{
                                 res.status(201).json({
                                     message: "user created"
