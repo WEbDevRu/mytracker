@@ -2,59 +2,74 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose')
 const Counter = require('../models/counters');
-router.get('/',  (async (req, res, next) => {
+const checkAuth = require('../middleware/check-auth')
+router.get('/', checkAuth, (async (req, res, next) => {
     const { page = 1, limit = 5 } = req.query
     const count = await Counter.countDocuments();
     Counter
-        .find()
+        .find({"profileId": req.userData.userId})
         .limit(limit * 1)
         .skip((page - 1) * limit)
         .sort({_id:-1})
         .exec()
         .then(docs =>{
+
             res.status(200).json({
                     items: docs,
                     totalPages: count,
                     currentPage: page
-
                 })
+
         })
-        .catch()
+        .catch(error =>{
+            res.status(500).json({
+                message: error
+            })
+        })
 }))
 
-router.post('/', ((req, res, next) => {
+router.post('/', checkAuth, (req, res, next) => {
     const counter = new Counter(
         {
             _id:  mongoose.Types.ObjectId(),
+            profileId: req.userData.userId,
             name: req.body.name,
             domen: req.body.domen,
-            dayusers: req.body.dayusers,
-            allusers: req.body.allusers,
-            status: req.body.status
+            dayusers: 0,
+            allusers: 0,
+            status: "checking"
     })
-    counter.save().then(result =>{
-        console.log(result)
-    }).catch(err => console.log(err))
-    res.status(200).json({
-        message: "POST запрос к счётчикам",
-        newCounter: counter
-    });
-}))
+    counter.save()
+        .then(
+            res.status(200).json({
+                message: "Counter posted",
+                newCounter: counter
+            }))
+        .catch(error =>{
+            res.status(500).json({
+                message: error
+            })
+        })
 
-router.get('/:counterId', ((req, res, next) => {
-    const id = req.params.counterId
-    Counter.findById(id)
+})
+
+router.get('/:counterId', checkAuth,(req, res, next) => {
+    Counter.find({"profileId": req.userData.userId, "_id": req.params.counterId})
         .exec()
         .then(doc =>{
-            console.log(doc)
-            res.status(200).json(doc)
+            if(doc.length > 0){
+                res.status(200).json(doc)
+            }
+            else{
+                res.status(404).json({message: "you do not have such a counter"})
+            }
+
         })
         .catch(err =>{
-            console.log(err)
-            res.status(503).json(err)
+            res.status(500).json(err)
         })
 
-}))
+})
 
 
 
