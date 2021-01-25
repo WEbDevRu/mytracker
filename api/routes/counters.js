@@ -5,7 +5,8 @@ const Counter = require('../models/counters');
 const checkAuth = require('../middleware/check-auth')
 router.get('/', checkAuth, (async (req, res, next) => {
     const { page = 1, limit = 5 } = req.query
-    const count = await Counter.countDocuments();
+    const count = await Counter.countDocuments({"profileId": req.userData.userId});
+
     Counter
         .find({"profileId": req.userData.userId})
         .limit(limit * 1)
@@ -58,7 +59,7 @@ router.get('/:counterId', checkAuth,(req, res, next) => {
         .exec()
         .then(doc =>{
             if(doc.length > 0){
-                res.status(200).json(doc)
+                res.status(200).json(doc[0])
             }
             else{
                 res.status(404).json({message: "you do not have such a counter"})
