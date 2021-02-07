@@ -7,7 +7,7 @@ const checkAuth = require('../../middleware/check-auth')
 
 
 //Отправить заявку на добавления в друзья
-router.post("/sendproposal/:userId", checkAuth, (req,res)=>{
+router.post("/proposal/:userId", checkAuth, (req,res)=>{
     if(req.params.userId != req.userData.userId){
         ProfileInfo
             .findOneAndUpdate({_id:req.params.userId}, {$addToSet :{proposals: req.userData.userId}})
@@ -25,7 +25,7 @@ router.post("/sendproposal/:userId", checkAuth, (req,res)=>{
 })
 
 //Отменить заявку на добаление в друзья
-router.delete("/removeproposal/:userId", checkAuth, (req,res)=>{
+router.delete("/proposal/:userId", checkAuth, (req,res)=>{
     ProfileInfo
         .findOneAndUpdate({_id:req.params.userId}, {$pull :{proposals: req.userData.userId}})
         .then(doc=>{
