@@ -5,7 +5,10 @@ const profileInfoSchema = new mongoose.Schema({
     name: String,
     soName: String,
     company: String,
-    description: String
+    description: String,
+    proposals: Array,
+    friends: Array,
+    newFriends: Array
 })
 
 module.exports = mongoose.model('profileInfo', profileInfoSchema)
