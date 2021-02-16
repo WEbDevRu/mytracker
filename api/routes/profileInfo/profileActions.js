@@ -137,20 +137,6 @@ router.delete("/delete_friend/:friendId", checkAuth, (req,res)=>{
 })
 
 
-// Эндпоинт для пинга заявок
-
- router.get("/your_proposals", checkAuth, (req,res)=>{
-    ProfileInfo
-        .findOne({_id:req.userData.userId})
-        .then(docs =>{
-            if(docs.proposals.length > 0 ){
-                res.status(200).json({proposals: docs.proposals})
-            }
-            else{
-                res.status(200).json({proposals: "no proposals"})
-            }
-        })
-})
 
 
 

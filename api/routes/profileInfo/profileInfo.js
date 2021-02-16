@@ -131,6 +131,33 @@ router.get("/friendslist", checkAuth, (async (req,res)=>{
 }))
 
 
+// Эндпоинт для пинга заявок
+
+router.get("/your_proposals", checkAuth, (req,res)=>{
+    ProfileInfo
+        .findOne({_id:req.userData.userId})
+        .then(docs =>{
+            if(docs.proposals.length > 0 ){
+                ProfileInfo.find({_id: docs.proposals}).then(docs=>{
+                    let proposals = docs.map((proposal) => {return {
+                        userId: proposal._id,
+                        name: proposal.name,
+                        soName: proposal.soName,
+                        company: proposal.company,
+                        description: proposal.description
+                    }})
+                    console.log(docs)
+                    res.status(200).json({proposals})
+                })
+
+            }
+            else{
+                res.status(200).json({proposals: "no proposals"})
+            }
+        })
+})
+
+
 
 
 
