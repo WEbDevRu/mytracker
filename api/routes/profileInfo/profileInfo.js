@@ -158,6 +158,31 @@ router.get("/your_proposals", checkAuth, (req,res)=>{
 })
 
 
+router.get("/friends", checkAuth, (req,res)=>{
+    ProfileInfo
+        .findOne({_id:req.userData.userId})
+        .then(docs =>{
+            if(docs.friends.length > 0 ){
+                ProfileInfo.find({_id: docs.friends}).then(docs=>{
+                    let friends = docs.map((friend) => {return {
+                        userId: friend._id,
+                        name: friend.name,
+                        soName: friend.soName,
+                        company: friend.company,
+                        description: friend.description
+                    }})
+                    console.log(docs)
+                    res.status(200).json({friends})
+                })
+
+            }
+            else{
+                res.status(200).json({friends: "no friends"})
+            }
+        })
+})
+
+
 
 
 
