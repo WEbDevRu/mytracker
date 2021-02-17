@@ -64,7 +64,10 @@ router.get("/userid/:userId",  (req,res)=>{
 
 
 router.get("/list",  (async (req,res)=>{
-    const { page = 1, limit = 5 } = req.query
+    let { page = 1, limit = 5 } = req.query
+    if(limit > 20){
+        limit = 20
+    }
     const count = await ProfileInfo.countDocuments();
     ProfileInfo
         .find()
@@ -84,7 +87,10 @@ router.get("/list",  (async (req,res)=>{
 }))
 
 router.get("/friendslist", checkAuth, (async (req,res)=>{
-    const { page = 1, limit = 5 } = req.query
+    let { page = 1, limit = 5 } = req.query
+    if(limit > 20){
+        limit = 20
+    }
     const count = await ProfileInfo.countDocuments();
     ProfileInfo
         .find()
@@ -159,6 +165,10 @@ router.get("/your_proposals", checkAuth, (req,res)=>{
 
 
 router.get("/friends", checkAuth, (req,res)=>{
+    let { page = 1, limit = 2 } = req.query
+    if (limit > 20){
+        limit = 20
+    }
     ProfileInfo
         .findOne({_id:req.userData.userId})
         .then(docs =>{
@@ -171,8 +181,12 @@ router.get("/friends", checkAuth, (req,res)=>{
                         company: friend.company,
                         description: friend.description
                     }})
-                    console.log(docs)
-                    res.status(200).json({friends})
+                    let friendsPage = friends.slice(page*limit - limit, page*limit)
+                    console.log(docs.length/limit+1)
+                    if(page > docs.length/limit+1){
+                        friendsPage = "that is all"
+                    }
+                    res.status(200).json({friendsPage, totalDocs: docs.length, currentPage: page})
                 })
 
             }
