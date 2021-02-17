@@ -191,7 +191,7 @@ router.get("/friends", checkAuth, (req,res)=>{
 
             }
             else{
-                res.status(200).json({friends: "no friends"})
+                res.status(200).json({friendsPage: "no friends"})
             }
         })
 })
