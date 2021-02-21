@@ -38,7 +38,8 @@ router.post('/', checkAuth, (req, res, next) => {
             domen: req.body.domen,
             dayusers: 0,
             allusers: 0,
-            status: "checking"
+            status: "checking",
+            users: []
     })
     counter.save()
         .then(

@@ -7,7 +7,8 @@ const counterSchema = new mongoose.Schema({
     domen: String,
     dayusers: Number,
     allusers: Number,
-    status: String
+    status: String,
+    users: Array
 })
 
 module.exports = mongoose.model('Counter', counterSchema)
