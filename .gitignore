@@ -6,7 +6,7 @@
 /.pnp
 /.vs
 .pnp.js
-
+/index.js
 # testing
 /coverage
 
