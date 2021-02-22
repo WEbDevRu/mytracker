@@ -69,8 +69,7 @@ router.post("/:counterId",  (req,res)=>{
                 })
             user.save().then(doc=>{
                 res.status(200).json({
-                    message: "user posted",
-                    newUser: doc
+                    tysId: doc._id
                 })
             })
 
