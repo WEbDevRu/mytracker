@@ -7,13 +7,10 @@ const mongoose = require('mongoose')
 
 router.get("/:counterId",  (req,res)=>{
     const counterId = req.params.counterId
-
     let  ip = req.headers['x-forwarded-for'] ||
         req.connection.remoteAddress ||
         req.socket.remoteAddress ||
         (req.connection.socket ? req.connection.socket.remoteAddress : null);
-
-
     const host = req.headers.host || "undefined"
     let user_agent = req.headers["user-agent"] || "undefined"
     let accept = req.headers.accept || "undefined"
@@ -30,8 +27,6 @@ router.get("/:counterId",  (req,res)=>{
     const deviceModel = ua.device.model || "undefined"
     const deviceType = ua.device.type|| "undefined"
     const cpu = ua.cpu.architecture || "undefined"
-
-
 
     axios.get('http://ip-api.com/json/'+ip)
         .then(response => {
@@ -70,7 +65,8 @@ router.get("/:counterId",  (req,res)=>{
 
             Counter
                 .findOneAndUpdate({_id: counterId}, {$push :{users: userInfo}}).then(response=>{
-                res.status(200).json(userInfo)
+                res.status(200).json({tysId: userInfo._id})
+                console.log(userInfo)
             })
 
         })
