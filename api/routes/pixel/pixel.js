@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const Counter = require('../../models/counters');
 const axios = require('axios');
 const parser = require('ua-parser-js');
 const mongoose = require('mongoose')
+const User = require('../../models/users')
 
-router.get("/:counterId",  (req,res)=>{
+router.post("/:counterId",  (req,res)=>{
     const counterId = req.params.counterId
     let  ip = req.headers['x-forwarded-for'] ||
         req.connection.remoteAddress ||
@@ -31,8 +31,6 @@ router.get("/:counterId",  (req,res)=>{
     axios.get('http://ip-api.com/json/'+ip)
         .then(response => {
             let userInfo = {
-                _id: mongoose.Types.ObjectId(),
-                time: new Date(),
                 ip: ip,
                 ipInfo: response.data,
                 headers: {
@@ -62,21 +60,61 @@ router.get("/:counterId",  (req,res)=>{
                     }
                 }
             }
-
-            Counter
-                .findOneAndUpdate({_id: counterId}, {$push :{users: userInfo}}).then(response=>{
-                res.status(200).json({tysId: userInfo._id})
-                console.log(userInfo)
+            const user = new User(
+                {
+                    _id:  mongoose.Types.ObjectId(),
+                    counterId: counterId,
+                    sessions: [{entryTime: new Date()}],
+                    data: userInfo
+                })
+            user.save().then(doc=>{
+                res.status(200).json({
+                    message: "user posted",
+                    newUser: doc
+                })
             })
+
+
 
         })
         .catch(error => {
            res.status(500).json({error: error})
         });
-
-
-
-
 })
+
+router.put("/end/:counterId",(req,res)=>{
+    User.findOneAndUpdate({_id: req.body.tysId, counterId: req.params.counterId}, {
+                    $push: {sessions: {goAwayTime: new Date()}}}).then(doc =>{
+                res.status(200).json({message: "goAwayTime sended"})
+
+        }).catch(error=>{
+            res.status(500).json({error: error})
+        })
+
+
+
+     .catch(error=>{
+         res.status(505).json(error)
+     })
+})
+
+
+router.put("/:counterId", (req,res)=>{
+    User.findOneAndUpdate({_id: req.body.tysId, counterId: req.params.counterId}, {
+        $push: {sessions: {entryTime: new Date()}}}).then(doc =>{
+        res.status(200).json({message: "entryTime sended"})
+
+    }).catch(error=>{
+        res.status(500).json({error: error})
+    })
+
+
+
+        .catch(error=>{
+            res.status(505).json(error)
+        })
+})
+
+
 
 module.exports = router

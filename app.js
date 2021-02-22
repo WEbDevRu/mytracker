@@ -21,7 +21,6 @@ app.use((req, res, next) => {
     next();
 
 })
-const usersRoutes = require('./api/routes/users')
 const countersRoutes = require('./api/routes/counters')
 const profileRoutes = require('./api/routes/profile')
 const sharetgRoutes = require('./api/routes/sharetg')
@@ -29,7 +28,6 @@ const profileInfoRoutes = require('./api/routes/profileInfo/profileInfo')
 const profileActionsRoutes = require('./api/routes/profileInfo/profileActions')
 const pixelRoutes = require('./api/routes/pixel/pixel')
 app.use(morgan('dev'))
-app.use('/users',usersRoutes)
 app.use('/counters',countersRoutes)
 app.use('/auth',profileRoutes)
 app.use('/sharetg', sharetgRoutes)
