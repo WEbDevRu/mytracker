@@ -3,15 +3,16 @@ const router = express.Router();
 const Counter = require('../../models/counters');
 const axios = require('axios');
 const parser = require('ua-parser-js');
+const mongoose = require('mongoose')
 
 router.get("/:counterId",  (req,res)=>{
     const counterId = req.params.counterId
 
-    /*let  ip = req.headers['x-forwarded-for'] ||
+    let  ip = req.headers['x-forwarded-for'] ||
         req.connection.remoteAddress ||
         req.socket.remoteAddress ||
-        (req.connection.socket ? req.connection.socket.remoteAddress : null); */
-    let ip = "::ffff:178.71.204.208"
+        (req.connection.socket ? req.connection.socket.remoteAddress : null);
+
 
     const host = req.headers.host || "undefined"
     let user_agent = req.headers["user-agent"] || "undefined"
@@ -35,6 +36,8 @@ router.get("/:counterId",  (req,res)=>{
     axios.get('http://ip-api.com/json/'+ip)
         .then(response => {
             let userInfo = {
+                _id: mongoose.Types.ObjectId(),
+                time: new Date(),
                 ip: ip,
                 ipInfo: response.data,
                 headers: {
@@ -66,15 +69,13 @@ router.get("/:counterId",  (req,res)=>{
             }
 
             Counter
-                .findOneAndUpdate({_id: counterId}, {$addToSet :{users: userInfo}})
+                .findOneAndUpdate({_id: counterId}, {$push :{users: userInfo}}).then(response=>{
+                res.status(200).json(userInfo)
+            })
 
-
-            res.status(200).json(userInfo)
-
-            console.log(response.data)
         })
         .catch(error => {
-            console.log(error);
+           res.status(500).json({error: error})
         });
 
 

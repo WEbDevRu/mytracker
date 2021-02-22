@@ -1,3 +1,5 @@
+
+
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
@@ -35,19 +37,20 @@ app.use('/profile', profileInfoRoutes)
 app.use('/profile', profileActionsRoutes)
 app.use('/pixel', pixelRoutes)
 mongoose.connect(
-    'mongodb+srv://nikrainev:wa46067820@cluster0.drt1e.mongodb.net/Cluster0?retryWrites=true&w=majority',
-{
-useMongoClient: true
-})
+    'mongodb+srv://nikrainev:wa46067820@cluster0.drt1e.mongodb.net/Cluster0?retryWrites=true&w=majority'
+    ,
+    {
+        useNewUrlParser: true
+    })
 
 
 
 
 app.use((req, res , next) => {
 
-    const error = new Error('Not found');
-    error.status = 404;
-    next(error);
+        const error = new Error('Not found');
+        error.status = 404;
+        next(error);
     }
 )
 
@@ -60,3 +63,4 @@ app.use((error, req, res, next) => {
     })
 })
 module.exports = app;
+
