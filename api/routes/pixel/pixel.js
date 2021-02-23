@@ -65,6 +65,8 @@ router.post("/:counterId",  (req,res)=>{
                     _id:  mongoose.Types.ObjectId(),
                     counterId: counterId,
                     sessions: [{entryTime: new Date()}],
+                    lastSession: new Date(),
+                    sessionsNumber: 1,
                     data: userInfo
                 })
             user.save().then(doc=>{
@@ -82,15 +84,25 @@ router.post("/:counterId",  (req,res)=>{
 })
 
 router.put("/end/:counterId",(req,res)=>{
-    User.findOneAndUpdate({_id: req.body.tysId, counterId: req.params.counterId}, {
-                    $push: {sessions: {goAwayTime: new Date()}}}).then(doc =>{
+    User.findOne({_id: req.body.tysId, counterId: req.params.counterId}).then(doc =>{
+        let sessionsArr = doc.sessions
+        console.log(Object.keys(sessionsArr[sessionsArr.length - 1])[0])
+        if(Object.keys(sessionsArr[sessionsArr.length - 1])[0] === 'goAwayTime'){
+            sessionsArr[sessionsArr.length - 1] = {goAwayTime: new Date()}
+            User.findOneAndUpdate({_id: req.body.tysId, counterId: req.params.counterId}, {
+                $set: {sessions: sessionsArr}}).then(doc =>{
                 res.status(200).json({message: "goAwayTime sended"})
 
-        }).catch(error=>{
-            res.status(500).json({error: error})
-        })
+            })
+        }
+        else{
+            User.findOneAndUpdate({_id: req.body.tysId, counterId: req.params.counterId}, {
+                $push: {sessions: {goAwayTime: new Date()}}}).then(doc =>{
+                res.status(200).json({message: "goAwayTime sended"})
 
-
+            })
+        }
+    })
 
      .catch(error=>{
          res.status(505).json(error)
@@ -100,18 +112,13 @@ router.put("/end/:counterId",(req,res)=>{
 
 router.put("/:counterId", (req,res)=>{
     User.findOneAndUpdate({_id: req.body.tysId, counterId: req.params.counterId}, {
-        $push: {sessions: {entryTime: new Date()}}}).then(doc =>{
+        $push: {sessions: {entryTime: new Date()}}, $set: {lastSession: new Date()}, $inc:{sessionsNumber: 1}}).then(doc =>{
         res.status(200).json({message: "entryTime sended"})
 
     }).catch(error=>{
         res.status(500).json({error: error})
     })
 
-
-
-        .catch(error=>{
-            res.status(505).json(error)
-        })
 })
 
 
