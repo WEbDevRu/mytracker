@@ -1,8 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
 const ProfileInfo = require('../../models/profileInfo/profileInfo');
-const Profile = require('../../models/profile')
 const checkAuth = require('../../middleware/check-auth')
 
 
@@ -182,7 +180,7 @@ router.get("/friends", checkAuth, (req,res)=>{
                         description: friend.description
                     }})
                     let friendsPage = friends.slice(page*limit - limit, page*limit)
-                    console.log(docs.length/limit+1)
+
                     if(page > docs.length/limit+1){
                         friendsPage = "that is all"
                     }

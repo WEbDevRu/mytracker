@@ -6,7 +6,8 @@ const userSchema = new mongoose.Schema({
     sessions: Array,
     lastSession: Date,
     sessionsNumber: Number,
-    data: Object
+    data: Object,
+    referer: String
 })
 
 module.exports = mongoose.model('User', userSchema)

@@ -45,7 +45,15 @@ router.post('/', checkAuth, (req, res, next) => {
         .then(
             res.status(200).json({
                 message: "Counter posted",
-                newCounter: counter
+                newCounter: counter,
+                pixelCode: "<script>\n" +
+                    "\tlet script = document.createElement('script');\n" +
+                    "\tscript.src = \"https://trackyour.site/scripts/pixel.js\"\n" +
+                    "\tdocument.head.append(script);\n" +
+                    "\tscript.onload = () => {\n" +
+                    "  \t\ttrackerInit("+"'"+counter._id+"'"+")\n" +
+                    "\t}\t\n" +
+                    "</script>"
             }))
         .catch(error =>{
             res.status(500).json({
@@ -56,11 +64,26 @@ router.post('/', checkAuth, (req, res, next) => {
 })
 
 router.get('/:counterId', checkAuth,(req, res, next) => {
-    Counter.find({"profileId": req.userData.userId, "_id": req.params.counterId})
+    Counter.findOne({profileId: req.userData.userId, _id: req.params.counterId})
         .exec()
         .then(doc =>{
-            if(doc.length > 0){
-                res.status(200).json(doc[0])
+            if(doc){
+                res.status(200).json({
+                    _id: doc._id,
+                    name: doc.name,
+                    domen: doc.domen,
+                    dayusers: doc.dayusers,
+                    allusers: doc.allusers,
+                    status: doc.status,
+                    pixelCode: "<script>\n" +
+                        "\tlet script = document.createElement('script');\n" +
+                        "\tscript.src = \"https://trackyour.site/scripts/pixel.js\"\n" +
+                        "\tdocument.head.append(script);\n" +
+                        "\tscript.onload = () => {\n" +
+                        "  \t\ttrackerInit("+"'"+doc._id+"'"+")\n" +
+                        "\t}\t\n" +
+                        "</script>"
+                })
             }
             else{
                 res.status(404).json({message: "you do not have such a counter"})

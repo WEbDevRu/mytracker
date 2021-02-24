@@ -7,6 +7,7 @@ const User = require('../../models/users')
 
 router.post("/:counterId",  (req,res)=>{
     const counterId = req.params.counterId
+    const referer = req.headers.referer
     let  ip = req.headers['x-forwarded-for'] ||
         req.connection.remoteAddress ||
         req.socket.remoteAddress ||
@@ -67,6 +68,7 @@ router.post("/:counterId",  (req,res)=>{
                     sessions: [{entryTime: new Date()}],
                     lastSession: new Date(),
                     sessionsNumber: 1,
+                    referer: referer,
                     data: userInfo
                 })
             user.save().then(doc=>{
