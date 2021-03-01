@@ -30,9 +30,12 @@ router.get("/counter/:counterId", (req, res)=>{
             res.status(200).json({usersPage, totalDocs: docs.length, currentPage: page})
         }
         else{
-            res.status(200).json({proposals: "no users"})
+            res.status(200).json({usersPage: "no users", totalDocs: 0})
         }
     })
+        .catch(error=>{
+            res.status(404).json({message: "counter not found"})
+        })
 })
 
 router.get("/user/:tysId", (req, res)=>{

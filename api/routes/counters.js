@@ -14,13 +14,11 @@ router.get('/', checkAuth, (async (req, res, next) => {
         .sort({_id:-1})
         .exec()
         .then(docs =>{
-
             res.status(200).json({
                     items: docs,
                     totalPages: count,
                     currentPage: page
                 })
-
         })
         .catch(error =>{
             res.status(500).json({
@@ -38,8 +36,7 @@ router.post('/', checkAuth, (req, res, next) => {
             domen: req.body.domen,
             dayusers: 0,
             allusers: 0,
-            status: "checking",
-            users: []
+            status: "checking"
     })
     counter.save()
         .then(
