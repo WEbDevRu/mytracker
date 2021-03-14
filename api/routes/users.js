@@ -59,7 +59,10 @@ router.get("/profile", checkAuth, (req,res)=>{
          if(docs.length > 0){
 
              let countersId = docs.map((counter)=>(counter._id))
-             User.find({counterId: countersId}).then(docs=>{
+             User
+                 .find({counterId: countersId})
+                 .sort({lastSession: -1})
+                 .then(docs=>{
 
                 if(docs.length > 0){
 
@@ -93,6 +96,116 @@ router.get("/profile", checkAuth, (req,res)=>{
              res.status(500).json({error: error})
          })
 })
+
+
+router.get("/summary", checkAuth, (req, res) => {
+    Counter.find({profileId: req.userData.userId})
+        .then(counters=>{
+            if(counters.length > 0){
+                let countersId = counters.map((counter)=>(counter._id))
+                let d = new Date()
+                let hours24Ago = Date.parse(d) - 24*60*60*1000
+                User
+                    .find({counterId: countersId, lastSession: {$gt: hours24Ago}})
+                    .sort({lastSession: -1})
+                    .then(docs=>{
+                        let clicks = 0
+                        docs.forEach((user, i, arr)=>{
+                            user.sessions.forEach((item, i, arr)=>{
+                                if(item.entryTime){
+                                if(Date.parse(item.entryTime) > Date.parse(d) - 24*60*60*1000){
+                                    clicks++
+                                }
+                                }
+                            })
+                        })
+                        res.status(200).json({users: docs.length, clicks: clicks})
+                    })
+
+            }
+            else{
+                res.status(200).json({users: 0, clicks: 0})
+            }
+
+    })
+        .catch(error=>{
+            res.status(500).json({error: error})
+        })
+})
+
+
+router.get("/summary/graphic", checkAuth, (req, res)=>{
+
+    Counter
+        .find({profileId: req.userData.userId})
+        .then(counters=>{
+            if(counters.length > 0) {
+                let countersId = counters.map((counter)=>(counter._id))
+
+                let graphicArr = []
+
+                let countUsersInHour = (hour) =>{
+                    let currentMilleSeconds = new Date().getMinutes()*60*1000 + new Date().getSeconds()*1000 + new Date().getMilliseconds()
+                    let toTime = 0
+                    let fromTime = 0
+                    if(hour === 0){
+                        toTime = Date.now()
+                    }
+                    else{
+                        toTime = Date.now() - currentMilleSeconds - 60*60*1000*(hour - 1)
+                    }
+                    if(hour === 0){
+                        fromTime = Date.now() - currentMilleSeconds
+                    }
+                    else{
+                        fromTime = Date.now() - 60*60*1000*hour - currentMilleSeconds
+                    }
+                    let pushGraphicArr = (usersCount) =>{
+                        graphicArr.push({usersCount: usersCount, hour: new Date(fromTime)})
+                    }
+
+                    return User
+                        .find({counterId: countersId, lastSession: {$gte: fromTime, $lt: toTime}})
+                        .then((users)=>{
+
+                            pushGraphicArr(users.length)
+                        })
+                }
+
+                let arrayOfPromises = []
+
+                for(let hour = 0; hour < 48; hour++){
+                    arrayOfPromises.push(countUsersInHour(hour))
+                }
+
+                Promise.all(arrayOfPromises).then(()=>{
+
+                     graphicArr = graphicArr.sort((hour1, hour2)=>{
+                        if (hour1.hour > hour2.hour) {
+                            return 1;
+                        }
+                        if (hour1.hour < hour2.hour) {
+                            return -1;
+                        }
+                        return 0
+                    })
+                    res.status(200).json({graphicArr: graphicArr})
+                }
+                )
+            }
+            else{
+                let graphicArr = []
+                for(let hour = 0; hour < 48; hour++){
+                    let currentMilleSeconds = new Date().getMinutes()*60*1000 + new Date().getSeconds()*1000 + new Date().getMilliseconds()
+                    let d = new Date(Date.now() - hour*60*60*1000 - currentMilleSeconds)
+                    graphicArr.push({time:d, users: 0})
+                }
+                res.status(200).json({graphicArr: graphicArr})
+            }
+        })
+
+})
+
 
 
 module.exports = router
