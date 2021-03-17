@@ -5,6 +5,7 @@
 /.idea
 /.pnp
 /.vs
+/.static
 .pnp.js
 /index.js
 # testing

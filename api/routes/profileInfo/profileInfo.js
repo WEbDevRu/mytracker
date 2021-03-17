@@ -2,9 +2,70 @@ const express = require('express');
 const router = express.Router();
 const ProfileInfo = require('../../models/profileInfo/profileInfo');
 const checkAuth = require('../../middleware/check-auth')
+const multer = require('multer')
+const sharp = require('sharp');
+
+
+const storage = multer.diskStorage({
+
+    destination: (req, file, cb) =>{
+        cb(null, './static/');
+    },
+    filename: (req, file, cb) =>{
+        cb(null, req.userData.userId + '.' + file.originalname.split('.').pop())
+        console.log(file)
+    }
+
+})
+
+const fileFilter = (req, file, cb) =>{
+    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png'){
+
+        cb(null, true)
+    }
+    else {
+        cb(new Error('Only png, jpeg, jpg allowed'))
+    }
+}
+
+
+const upload = multer({
+    storage: storage,
+    limits : {
+        fileSize: 1024*1024*5
+    },
+    fileFilter: fileFilter
+
+}).fields([{
+    name: 'avatarImage',
+    maxCount: 1
+}
+])
+
+router.post("/avatar",  checkAuth, (req, res, next)=>{
+    upload(req,res,(err)=>{
+        if(err){
+            return res.status(400).json({error: err.message})
+        }
+        next()
+    })
+
+
+})
+
+router.post("/avatar", checkAuth,  (req,res)=>{
 
 
 
+         sharp(req.files.avatarImage[0].path)
+        .resize({ fit: sharp.fit.cover, width: 300, height: 300 })
+        .toFormat("jpg")
+        .png({ quality: 100 })
+        .toFile('static/'+req.userData.userId+'_min.jpg');
+
+
+    res.status(200).json({message: "avatar uploaded"})
+})
 
 router.put("/", checkAuth, (req,res)=>{
     let newInfo = req.body;
@@ -27,6 +88,8 @@ router.put("/", checkAuth, (req,res)=>{
 
         });
 })
+
+
 
 router.get("/", checkAuth, (req,res)=>{
     ProfileInfo

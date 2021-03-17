@@ -8,7 +8,8 @@ const profileInfoSchema = new mongoose.Schema({
     description: String,
     proposals: Array,
     friends: Array,
-    newFriends: Array
+    newFriends: Array,
+    avatar: {type: String, required: true}
 })
 
 module.exports = mongoose.model('profileInfo', profileInfoSchema)
