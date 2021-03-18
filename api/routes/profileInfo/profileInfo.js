@@ -67,12 +67,17 @@ router.post("/avatar", checkAuth,  (req,res)=>{
         ).catch(error => res.status(500).json({error: error})
 
         )
+})
 
-
-
-
-
-
+router.get("/avatar", checkAuth,  (req,res)=>{
+    ProfileInfo
+        .findOne({_id:req.userData.userId})
+        .then(docs =>{
+                res.status(200).json({avatar: docs.avatar})
+        })
+        .catch(error=>{
+            res.status(500).json({message: error})
+        })
 })
 
 router.put("/", checkAuth, (req,res)=>{
