@@ -54,17 +54,25 @@ router.post("/avatar",  checkAuth, (req, res, next)=>{
 })
 
 router.post("/avatar", checkAuth,  (req,res)=>{
-
-
-
-         sharp(req.files.avatarImage[0].path)
+    sharp(req.files.avatarImage[0].path)
         .resize({ fit: sharp.fit.cover, width: 300, height: 300 })
         .toFormat("jpg")
         .png({ quality: 100 })
-        .toFile('static/'+req.userData.userId+'_min.jpg');
+        .toFile('static/'+req.userData.userId+'_min.jpg')
+        .then(
+        ProfileInfo
+            .findOneAndUpdate({_id:req.userData.userId}, {avatar: 'static/'+req.userData.userId+'_min.jpg'}))
+        .then(
+            res.status(200).json({message: "avatar uploaded", avatar: 'static/'+req.userData.userId+'_min.jpg'})
+        ).catch(error => res.status(500).json({error: error})
+
+        )
 
 
-    res.status(200).json({message: "avatar uploaded"})
+
+
+
+
 })
 
 router.put("/", checkAuth, (req,res)=>{

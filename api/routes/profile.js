@@ -52,7 +52,8 @@ router.post('/signup', (req,res,next) =>{
                                 name: "",
                                 soName: "",
                                 company: "",
-                                description: ""
+                                description: "",
+                                avatar: 'none'
 
                             })
                         profile
