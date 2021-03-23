@@ -175,13 +175,13 @@ router.get("/friendslist", checkAuth, (async (req,res)=>{
         .then(docs =>{
             let newdocs = docs.map((doc) => {
                 let friendStatus = undefined
-                if (req.userData.userId == doc._id){
+                if (req.userData.userId === doc._id){
                     friendStatus = "It is you"
                 }
-                else if(doc.friends.indexOf(req.userData.userId) != -1){
+                else if(doc.friends.indexOf(req.userData.userId) !== -1){
                     friendStatus = "Your friend"
                 }
-                else if(doc.proposals.indexOf(req.userData.userId)!= -1){
+                else if(doc.proposals.indexOf(req.userData.userId)!== -1){
                     friendStatus = "proposal sent"
                 }
                 else {

@@ -1,30 +1,96 @@
+"use strict"
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose')
 const Counter = require('../models/counters');
+const Profile = require('../models/profile');
+const User = require('../models/users')
 const checkAuth = require('../middleware/check-auth')
+
+
+
+
 router.get('/', checkAuth, (async (req, res, next) => {
     const { page = 1, limit = 5 } = req.query
     const count = await Counter.countDocuments({"profileId": req.userData.userId});
-
     Counter
         .find({"profileId": req.userData.userId})
         .limit(limit * 1)
         .skip((page - 1) * limit)
         .sort({_id:-1})
-        .exec()
-        .then(docs =>{
-            res.status(200).json({
-                    items: docs,
-                    totalPages: count,
-                    currentPage: page
+        .then(counters =>{
+            return counters
+        })
+        .then(counters=>{
+            // получаю login пользователя по profileId
+            let arrayPromises = []
+            let countersId = counters.map(counter =>(counter._id))
+            console.log(countersId)
+
+
+            counters.forEach((counter) =>{
+                let getUserNick = (counter) =>{
+
+                    return Profile.findOne({_id: counter.profileId})
+                        .then(user =>{
+                            let counterWithLogin = {...counter._doc}
+                            counterWithLogin.login = user.login
+                            delete counterWithLogin.profileId
+                            return counterWithLogin
+                        })
+                        .catch(error =>{
+                            console.log(error)
+                        })
+                }
+
+                arrayPromises.push(getUserNick(counter))
+            })
+
+            return Promise.all(arrayPromises).then(counters => (counters))
+
+        })
+        .then(counters =>{
+            // получаю количество  пользователей
+            let countersId = counters.map(counter =>(counter._id))
+            return User
+                .find({counterId: countersId})
+                .then(users =>{
+
+                    let countersWithUsers = [...counters]
+                    countersWithUsers.forEach((counter, counterIndex) =>{
+                        users.forEach((user) =>{
+                            if(counter._id.toString() === user.counterId.toString()){
+                                countersWithUsers[counterIndex].allusers = ++countersWithUsers[counterIndex].allusers
+                                let date = new Date()
+                                if(Date.now() - Date.parse(user.lastSession) < date.getHours()*60*60*1000 + date.getMinutes()*60*1000 +
+                                    date.getSeconds()*1000 + date.getMilliseconds()){
+                                    countersWithUsers[counterIndex].dayusers = ++countersWithUsers[counterIndex].dayusers
+                                }
+                            }
+                        })
+                    })
+                    return countersWithUsers
                 })
+
+        })
+        .then(counters =>{
+            res.status(200).json({
+                items: counters,
+                totalPages: count,
+                currentPage: page
+            })
         })
         .catch(error =>{
             res.status(500).json({
                 message: error
             })
         })
+}))
+
+
+
+router.get('/friendsCounters', checkAuth, (async (req, res)=>{
+
 }))
 
 router.post('/', checkAuth, (req, res, next) => {
