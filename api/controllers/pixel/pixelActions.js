@@ -1,11 +1,10 @@
-const express = require('express');
-const router = express.Router();
 const axios = require('axios');
 const parser = require('ua-parser-js');
 const mongoose = require('mongoose')
 const User = require('../../models/users')
 
-router.post("/:counterId",  (req,res)=>{
+
+exports.post_newUser = (req,res)=>{
     const counterId = req.params.counterId
     const referer = req.headers.referer
     let  ip = req.headers['x-forwarded-for'] ||
@@ -81,11 +80,12 @@ router.post("/:counterId",  (req,res)=>{
 
         })
         .catch(error => {
-           res.status(500).json({error: error})
+            res.status(500).json({error: error})
         });
-})
+}
 
-router.put("/end/:counterId",(req,res)=>{
+
+exports.update_goAwayTime = (req,res)=>{
     User.findOne({_id: req.body.tysId, counterId: req.params.counterId}).then(doc =>{
         let sessionsArr = doc.sessions
         console.log(Object.keys(sessionsArr[sessionsArr.length - 1])[0])
@@ -106,13 +106,12 @@ router.put("/end/:counterId",(req,res)=>{
         }
     })
 
-     .catch(error=>{
-         res.status(505).json(error)
-     })
-})
+        .catch(error=>{
+            res.status(505).json(error)
+        })
+}
 
-
-router.put("/:counterId", (req,res)=>{
+exports.update_user = (req,res)=>{
     User.findOneAndUpdate({_id: req.body.tysId, counterId: req.params.counterId}, {
         $push: {sessions: {entryTime: new Date()}}, $set: {lastSession: new Date()}, $inc:{sessionsNumber: 1}}).then(doc =>{
         res.status(200).json({message: "entryTime sended"})
@@ -121,8 +120,4 @@ router.put("/:counterId", (req,res)=>{
         res.status(500).json({error: error})
     })
 
-})
-
-
-
-module.exports = router
+}

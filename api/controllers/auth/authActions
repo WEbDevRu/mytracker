@@ -3,13 +3,12 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const bcrypt =require('bcrypt')
 const jwt = require('jsonwebtoken')
-const Profile = require('../models/profile');
-const ProfileInfo = require('../models/profileInfo/profileInfo');
-const checkAuth = require('../middleware/check-auth')
+const Auth = require('../../models/profile');
+const ProfileInfo = require('../../models/profileInfo/profileInfo');
 
-router.post('/signup', (req,res,next) =>{
 
-    Profile.find().or([{'email': req.body.email},{'login': req.body.login}])
+exports.post_signup_info = (req,res,next) =>{
+    Auth.find().or([{'email': req.body.email},{'login': req.body.login}])
         .exec()
         .then(user =>{
             if(user.length >= 1){
@@ -39,7 +38,7 @@ router.post('/signup', (req,res,next) =>{
                     }
                     else{
                         const userId = mongoose.Types.ObjectId();
-                        const profile = new Profile({
+                        const profile = new Auth({
                             _id: userId,
                             email: req.body.email,
                             login: req.body.login,
@@ -75,10 +74,10 @@ router.post('/signup', (req,res,next) =>{
                 })
             }
         })
-})
+}
 
-router.post("/login", (req, res, next) => {
-    Profile.find({email: req.body.email})
+exports.post_login_info = (req, res, next) => {
+    Auth.find({email: req.body.email})
         .exec()
         .then(user=>{
             if(user.length < 1){
@@ -113,28 +112,4 @@ router.post("/login", (req, res, next) => {
                 })
             })
         })
-})
-
-
-router.get("/me", checkAuth, (req,res)=>{
-    Profile
-        .findOne({email:req.userData.email})
-        .limit(1)
-        .sort({_id:-1})
-        .exec()
-        .then(docs =>{
-            res.status(200).json({
-                userId: docs._id,
-                email: docs.email,
-                login: docs.login,
-                regDate: docs.regDate,
-
-
-            })
-        })
-
-})
-
-
-
-module.exports = router
+}
