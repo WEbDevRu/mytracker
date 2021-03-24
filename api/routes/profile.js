@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const checkAuth = require('../middleware/check-auth')
 const ProfileActions = require('../controllers/profile/profileActions')
-const ProfileInfoController = require('../controllers/profile/profileInfo')
-const ProfileInfo = require('../models/profileInfo/profileInfo')
+const ProfileInfo = require('../controllers/profile/profileInfo')
+const Profile = require('../models/profile')
 const multer = require('multer')
 const sharp = require('sharp');
 
@@ -83,7 +83,7 @@ router.post("/avatar", checkAuth,  (req,res)=>{
         .png({ quality: 100 })
         .toFile('static/'+req.userData.userId+'_min.jpg')
         .then(
-            ProfileInfo
+            Profile
                 .findOneAndUpdate({_id:req.userData.userId}, {avatar: 'static/'+req.userData.userId+'_min.jpg'}))
         .then(
             res.status(200).json({message: "avatar uploaded", avatar: 'static/'+req.userData.userId+'_min.jpg'})
@@ -94,11 +94,11 @@ router.post("/avatar", checkAuth,  (req,res)=>{
 
 
 // Получить аватар
-router.get("/avatar", checkAuth, ProfileInfoController.get_avatar)
+router.get("/avatar", checkAuth, ProfileInfo.get_avatar)
 
 router.put("/", checkAuth, (req,res)=>{
     let newInfo = req.body;
-    ProfileInfo
+    Profile
         .findOneAndUpdate({_id:req.userData.userId}, req.body)
         .exec((err, product) =>{
             if(err){
@@ -120,22 +120,22 @@ router.put("/", checkAuth, (req,res)=>{
 
 
 //Получить информацию о своём профиле
-router.get("/", checkAuth, ProfileInfoController.get_profile_info)
+router.get("/", checkAuth, ProfileInfo.get_profile_info)
 
 //Информация о чужом профиле по Id
-router.get("/userid/:userId",  ProfileInfoController.get_profile_info_byId)
+router.get("/userid/:userId",  ProfileInfo.get_profile_info_byId)
 
 //Полный список пользователей (нужен для разработки)
-router.get("/list",  ProfileInfoController.get_profiles_full_list)
+router.get("/list",  ProfileInfo.get_profiles_full_list)
 
 //Список пользователей с отношением к запращиващему профилю
-router.get("/friendslist", checkAuth, ProfileInfoController.get_profiles_list)
+router.get("/friendslist", checkAuth, ProfileInfo.get_profiles_list)
 
 // Эндпоинт для пинга заявок
-router.get("/your_proposals", checkAuth, ProfileInfoController.get_your_proposals)
+router.get("/your_proposals", checkAuth, ProfileInfo.get_your_proposals)
 
 //Список пользователей
-router.get("/friends", checkAuth, ProfileInfoController.get_friends_list)
+router.get("/friends", checkAuth, ProfileInfo.get_friends_list)
 
 
 

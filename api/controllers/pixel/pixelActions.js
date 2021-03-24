@@ -2,6 +2,7 @@ const axios = require('axios');
 const parser = require('ua-parser-js');
 const mongoose = require('mongoose')
 const User = require('../../models/users')
+const Counter = require('../../models/counters')
 
 
 exports.post_newUser = (req,res)=>{
@@ -70,10 +71,15 @@ exports.post_newUser = (req,res)=>{
                     referer: referer,
                     data: userInfo
                 })
-            user.save().then(doc=>{
+
+                user
+                .save()
+                .then(doc=>{
                 res.status(200).json({
                     tysId: doc._id
-                })
+                }).then(
+                    Counter.findOneAndUpdate({_id: counterId}, {$inc:{allusers: 1}})
+                )
             })
 
 
@@ -107,7 +113,7 @@ exports.update_goAwayTime = (req,res)=>{
     })
 
         .catch(error=>{
-            res.status(505).json(error)
+            res.status(500).json(error)
         })
 }
 

@@ -1,5 +1,5 @@
 
-const Auth = require('../../models/profile');
+const Auth = require('../../models/auth');
 exports.get_auth_info = (req,res)=>{
     Auth
         .findOne({email:req.userData.email})

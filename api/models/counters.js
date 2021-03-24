@@ -5,8 +5,7 @@ const counterSchema = new mongoose.Schema({
     profileId: mongoose.Schema.Types.ObjectId,
     name: String,
     domen: String,
-    dayusers: Number,
-    allusers: Number,
+    allusers: Number
 })
 
 module.exports = mongoose.model('Counter', counterSchema)

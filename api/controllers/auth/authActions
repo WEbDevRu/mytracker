@@ -3,8 +3,8 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const bcrypt =require('bcrypt')
 const jwt = require('jsonwebtoken')
-const Auth = require('../../models/profile');
-const ProfileInfo = require('../../models/profileInfo/profileInfo');
+const Auth = require('../../models/auth');
+const Profile = require('../../models/profile');
 
 
 exports.post_signup_info = (req,res,next) =>{
@@ -45,7 +45,7 @@ exports.post_signup_info = (req,res,next) =>{
                             regDate: new Date(),
                             password: hash
                         })
-                        const newProfileInfo = new ProfileInfo(
+                        const newProfile = new Profile(
                             {
                                 _id: userId,
                                 name: "",
@@ -57,7 +57,7 @@ exports.post_signup_info = (req,res,next) =>{
                             })
                         profile
                             .save()
-                        newProfileInfo.save()
+                        newProfile.save()
                             .then(result =>{
                                 res.status(201).json({
                                     message: "user created"

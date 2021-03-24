@@ -1,7 +1,7 @@
-const ProfileInfo = require('../../models/profileInfo/profileInfo');
+const Profile = require('../../models/profile');
 
 exports.get_avatar = (req,res)=>{
-    ProfileInfo
+    Profile
         .findOne({_id:req.userData.userId})
         .then(docs =>{
             res.status(200).json({avatar: docs.avatar})
@@ -12,7 +12,7 @@ exports.get_avatar = (req,res)=>{
 }
 
 exports.get_profile_info = (req,res)=>{
-    ProfileInfo
+    Profile
         .findOne({_id:req.userData.userId})
         .then(docs =>{
             if(docs){
@@ -25,7 +25,7 @@ exports.get_profile_info = (req,res)=>{
 }
 
 exports.get_profile_info_byId = (req,res)=>{
-    ProfileInfo
+    Profile
         .findOne({_id: req.params.userId})
         .then(docs =>{
             if(docs){
@@ -48,12 +48,11 @@ exports.get_profiles_full_list = (async (req,res)=>{
         limit = 20
     }
     const count = await ProfileInfo.countDocuments();
-    ProfileInfo
+    Profile
         .find()
-        .limit(limit * 1)
+        .limit(limit)
         .skip((page - 1) * limit)
         .sort({_id:-1})
-        .exec()
         .then(docs =>{
             res.status(200).json({
                 items: docs,
@@ -71,12 +70,11 @@ exports.get_profiles_list = (async (req,res)=>{
         limit = 20
     }
     const count = await ProfileInfo.countDocuments();
-    ProfileInfo
+    Profile
         .find()
-        .limit(limit * 1)
+        .limit(limit)
         .skip((page - 1) * limit)
         .sort({_id:-1})
-        .exec()
         .then(docs =>{
             let newdocs = docs.map((doc) => {
                 let friendStatus = undefined
@@ -116,11 +114,12 @@ exports.get_profiles_list = (async (req,res)=>{
 })
 
 exports.get_your_proposals = (req,res)=>{
-    ProfileInfo
+    Profile
         .findOne({_id:req.userData.userId})
         .then(docs =>{
             if(docs.proposals.length > 0 ){
-                ProfileInfo.find({_id: docs.proposals}).then(docs=>{
+                Profile
+                    .find({_id: docs.proposals}).then(docs=>{
                     let proposals = docs.map((proposal) => {return {
                         userId: proposal._id,
                         name: proposal.name,
@@ -144,11 +143,13 @@ exports.get_friends_list =  (req,res)=>{
     if (limit > 20){
         limit = 20
     }
-    ProfileInfo
+    Profile
         .findOne({_id:req.userData.userId})
         .then(docs =>{
             if(docs.friends.length > 0 ){
-                ProfileInfo.find({_id: docs.friends}).then(docs=>{
+                Profile
+                    .find({_id: docs.friends})
+                    .then(docs=>{
                     let friends = docs.map((friend) => {return {
                         userId: friend._id,
                         name: friend.name,
