@@ -171,7 +171,16 @@ exports.get_counter_byId = (async (req, res) => {
                 let newCounter = {...counter._doc}
                 newCounter.dayusers = users.length
                 newCounter.login = login
-                res.status(200).json(newCounter)
+                res.status(200).json({
+                    ...newCounter,
+                    pixelCode: "<script>\n" +
+                "\tlet script = document.createElement('script');\n" +
+                "\tscript.src = \"https://trackyour.site/scripts/pixel.js\"\n" +
+                "\tdocument.head.append(script);\n" +
+                "\tscript.onload = () => {\n" +
+                "  \t\ttrackerInit("+"'"+newCounter._id+"'"+")\n" +
+                "\t}\t\n" +
+                "</script>"})
             })
             .catch(err =>{
             res.status(500).json({error: err})

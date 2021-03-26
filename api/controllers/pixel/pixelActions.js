@@ -75,11 +75,12 @@ exports.post_newUser = (req,res)=>{
                 user
                 .save()
                 .then(doc=>{
-                res.status(200).json({
-                    tysId: doc._id
-                }).then(
-                    Counter.findOneAndUpdate({_id: counterId}, {$inc:{allusers: 1}})
-                )
+                    Counter
+                        .findOneAndUpdate({_id: counterId}, {$inc:{allusers: 1}})
+                        .then(res.status(200).json({
+                        tysId: doc._id
+                    }))
+
             })
 
 
