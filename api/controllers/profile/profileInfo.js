@@ -69,7 +69,7 @@ exports.get_profiles_list = (async (req,res)=>{
     if(limit > 20){
         limit = 20
     }
-    const count = await ProfileInfo.countDocuments();
+    const count = await Profile.countDocuments();
     Profile
         .find()
         .limit(limit)

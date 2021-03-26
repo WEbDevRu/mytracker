@@ -129,7 +129,7 @@ router.get("/userid/:userId",  ProfileInfo.get_profile_info_byId)
 router.get("/list",  ProfileInfo.get_profiles_full_list)
 
 //Список пользователей с отношением к запращиващему профилю
-router.get("/friendslist", checkAuth, ProfileInfo.get_profiles_list)
+router.get("/profileslist", checkAuth, ProfileInfo.get_profiles_list)
 
 // Эндпоинт для пинга заявок
 router.get("/your_proposals", checkAuth, ProfileInfo.get_your_proposals)

@@ -15,7 +15,7 @@ router.get("/user/:tysId", UsersInfo.get_user_byId)
 router.get("/profile", checkAuth, UsersInfo.get_profile_users)
 
 // Краткая сводка за сутки
-router.get("/summary", checkAuth, )
+router.get("/summary", checkAuth, UsersInfo.get_summary)
 
 // Данные для графика выводящего количество пользователей в час
 router.get("/summary/graphic", checkAuth, UsersInfo.get_summary_graphic)

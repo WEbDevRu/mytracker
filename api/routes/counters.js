@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose')
-const Counter = require('../models/counters');
+
 const checkAuth = require('../middleware/check-auth')
 
 const CounterInfo = require('../controllers/counters/countersInfo')
