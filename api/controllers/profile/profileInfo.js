@@ -47,10 +47,10 @@ exports.get_profiles_full_list = (async (req,res)=>{
     if(limit > 20){
         limit = 20
     }
-    const count = await ProfileInfo.countDocuments();
+    const count = await Profile.countDocuments();
     Profile
         .find()
-        .limit(limit)
+        .limit(limit*1)
         .skip((page - 1) * limit)
         .sort({_id:-1})
         .then(docs =>{
@@ -61,7 +61,9 @@ exports.get_profiles_full_list = (async (req,res)=>{
 
             })
         })
-        .catch()
+        .catch(err =>{
+            res.status(500).json({error: err})
+        })
 })
 
 exports.get_profiles_list = (async (req,res)=>{
@@ -72,7 +74,7 @@ exports.get_profiles_list = (async (req,res)=>{
     const count = await Profile.countDocuments();
     Profile
         .find()
-        .limit(limit)
+        .limit(limit*1)
         .skip((page - 1) * limit)
         .sort({_id:-1})
         .then(docs =>{
@@ -109,7 +111,7 @@ exports.get_profiles_list = (async (req,res)=>{
             })
         })
         .catch(error=>{
-            res.status(404).json({message: error})
+            res.status(500).json({message: error})
         })
 })
 
