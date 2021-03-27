@@ -78,19 +78,17 @@ exports.get_profile_counters = (async (req, res, next) => {
 
 exports.get_friends_counters = (async (req, res, next) => {
     const {page = 1, limit = 5} = req.query
-    const count = await Counter.countDocuments({"profileId": req.userData.userId})
-    Profile
-        .findOne({"_id": req.userData.userId})
-        .then(user=>{
-            return Counter
-                .find({profileId: user.friends})
-                .limit(limit*1)
-                .skip((page - 1) * limit)
-                .sort({_id:-1})
-                .then(friendsCounters =>{
+    const friends = await Profile.findOne({"_id": req.userData.userId}).then(docs => (docs.friends))
+    const count = await Counter.countDocuments({profileId: friends})
 
-                    return friendsCounters
-            })
+    Counter
+        .find({profileId: friends})
+        .limit(limit*1)
+        .skip((page - 1) * limit)
+        .sort({_id:-1})
+        .then(friendsCounters =>{
+
+            return friendsCounters
         })
         .then(friendsCounters =>{
 
@@ -116,7 +114,6 @@ exports.get_friends_counters = (async (req, res, next) => {
             return Promise.all(arrayPromises).then(counters => (counters))
         })
         .then(counters =>{
-            console.log(counters)
             return getCounterWithUsers(counters)
 
         })
