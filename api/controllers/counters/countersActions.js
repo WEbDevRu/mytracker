@@ -1,5 +1,5 @@
 const Counter = require('../../models/counters');
-
+const mongoose = require('mongoose');
 exports.post_counter = (req, res, next) => {
     const counter = new Counter(
         {
