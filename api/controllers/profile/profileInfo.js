@@ -80,7 +80,8 @@ exports.get_profiles_list = (async (req,res)=>{
         .then(docs =>{
             let newdocs = docs.map((doc) => {
                 let friendStatus = undefined
-                if (req.userData.userId === doc._id){
+                console.log(req.userData.userId, doc._id)
+                if (req.userData.userId.toString() === doc._id.toString()){
                     friendStatus = "It is you"
                 }
                 else if(doc.friends.indexOf(req.userData.userId) !== -1){

@@ -164,7 +164,7 @@ exports.get_counter_byId = (async (req, res) => {
         User
             .find({counterId: req.params.counterId, lastSession: {$gte: dayBeginTime}})
             .then(users=>{
-                console.log(counter)
+
                 let newCounter = {...counter._doc}
                 newCounter.dayusers = users.length
                 newCounter.login = login
