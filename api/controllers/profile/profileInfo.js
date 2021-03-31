@@ -1,10 +1,14 @@
 const Profile = require('../../models/profile');
-
 exports.get_avatar = (req,res)=>{
     Profile
         .findOne({_id:req.userData.userId})
         .then(docs =>{
-            res.status(200).json({avatar: docs.avatar})
+            let avatar = docs.avatar
+            console.log(docs)
+            if (docs.avatar !== 'none'){
+                avatar = "https://trackyour.site:3443/" + docs.avatar
+            }
+            res.status(200).json({avatar: avatar})
         })
         .catch(error=>{
             res.status(500).json({message: error})
