@@ -1,11 +1,9 @@
-const express = require('express');
-const router = express.Router();
+const nodemailer = require('nodemailer');
 const mongoose = require('mongoose');
-const bcrypt =require('bcrypt')
+const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const Auth = require('../../models/auth');
-const Profile = require('../../models/profile');
-
+const regEmail = require('./regestrationEmail')
 
 exports.post_signup_info = (req,res,next) =>{
     Auth.find().or([{'email': req.body.email},{'login': req.body.login}])
@@ -45,36 +43,89 @@ exports.post_signup_info = (req,res,next) =>{
                             regDate: new Date(),
                             password: hash
                         })
-                        const newProfile = new Profile(
-                            {
-                                _id: userId,
-                                name: "",
-                                soName: "",
-                                company: "",
-                                description: "",
-                                avatar: 'none'
-
-                            })
                         profile
                             .save()
-                        newProfile.save()
-                            .then(result =>{
+                            .then( async (user)=>  {
+                                let transporter = nodemailer.createTransport({
+                                    host: 'mail.jino.ru',
+                                    port: 587,
+                                    secure: false,
+                                    auth: {
+                                        user: 'noreply@trackyour.site',
+                                        pass: 'wa46067820',
+                                    },
+                                })
+
+                                const token = jwt.sign(
+                                    {
+                                        userId: user._id,
+                                        type: 'registration'
+                                    },
+                                    'jerjg',
+                                    {
+                                        expiresIn: '1h'
+                                    }
+                                )
+
+
+                                return await transporter.sendMail({
+                                    from: 'noreply@trackyour.site',
+                                    to: user.email,
+                                    subject: 'trackyour.site Registration',
+                                    text: 'This message was sent from Node js server.',
+                                    html: regEmail
+                                })
+                            })
+                            .then((mail)=>{
+                                console.log(mail)
                                 res.status(201).json({
                                     message: "user created"
                                 })
-                            })
+                                })
                             .catch(err=>{
-                                console.log(err)
                                 res.status(500).json({
                                     error: err
                                 })
                             })
+
+
+
+
+
                     }
 
                 })
             }
         })
 }
+
+
+
+
+
+
+
+/*const newProfile = new Profile(
+    {
+        _id: userId,
+        name: "",
+        soName: "",
+        company: "",
+        description: "",
+        avatar: 'none'
+
+    }) */
+
+
+
+
+
+
+
+
+
+
+
 
 exports.post_login_info = (req, res, next) => {
     Auth.find({email: req.body.email})

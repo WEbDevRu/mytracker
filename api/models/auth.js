@@ -21,7 +21,8 @@ const authSchema = new mongoose.Schema({
     },
     regDate: {
         type: Date
-    }
+    },
+    stage: String
 
 })
 

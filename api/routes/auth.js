@@ -15,5 +15,4 @@ router.post("/login", AuthActions.post_login_info)
 router.get("/me", checkAuth, AuthInfo.get_auth_info)
 
 
-
 module.exports = router

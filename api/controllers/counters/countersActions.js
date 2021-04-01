@@ -10,6 +10,7 @@ exports.post_counter = (req, res, next) => {
             dayusers: 0,
             allusers: 0,
             status: "checking"
+
         })
     counter.save()
         .then(
