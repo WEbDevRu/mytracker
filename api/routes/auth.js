@@ -8,6 +8,12 @@ const AuthActions = require('../controllers/auth/authActions')
 // Регистрация
 router.post('/signup', AuthActions.post_signup_info)
 
+//Подтверждение почты
+router.put('/confirm_email/:confirm_token', AuthActions.confirm_email)
+
+//Дополнительная информация
+router.put('/additional_information', checkAuth, AuthActions.add_info)
+
 //Вход (через форму или куки)
 router.post("/login", AuthActions.post_login_info)
 

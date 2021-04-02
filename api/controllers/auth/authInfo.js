@@ -13,7 +13,8 @@ exports.get_auth_info = (req,res)=>{
                 userId: docs._id,
                 email: docs.email,
                 login: docs.login,
-                regDate: docs.regDate
+                regDate: docs.regDate,
+                stage: docs.stage
 
             })
         })

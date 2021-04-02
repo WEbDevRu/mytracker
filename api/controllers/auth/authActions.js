@@ -1,9 +1,10 @@
 const nodemailer = require('nodemailer');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
 const Auth = require('../../models/auth');
-const regEmail = require('./regestrationEmail')
+const emailTemplate = require('./regestrationEmail')
+const jwt = require('jsonwebtoken')
+const Profile = require('../../models/profile')
 
 exports.post_signup_info = (req,res,next) =>{
     Auth.find().or([{'email': req.body.email},{'login': req.body.login}])
@@ -41,7 +42,8 @@ exports.post_signup_info = (req,res,next) =>{
                             email: req.body.email,
                             login: req.body.login,
                             regDate: new Date(),
-                            password: hash
+                            password: hash,
+                            stage: 'confirm email'
                         })
                         profile
                             .save()
@@ -73,11 +75,10 @@ exports.post_signup_info = (req,res,next) =>{
                                     to: user.email,
                                     subject: 'trackyour.site Registration',
                                     text: 'This message was sent from Node js server.',
-                                    html: regEmail
+                                    html: emailTemplate.regEmail(token)
                                 })
                             })
                             .then((mail)=>{
-                                console.log(mail)
                                 res.status(201).json({
                                     message: "user created"
                                 })
@@ -99,22 +100,47 @@ exports.post_signup_info = (req,res,next) =>{
         })
 }
 
+exports.confirm_email = (req, res) =>{
+    const decoded = jwt.verify(req.params.confirm_token, 'jerjg')
+
+    if(decoded === 'jwt expired'){
+        res.status(200).json({message: 'jwt expired'})
+    }
+    else if(decoded.type === 'registration') {
+        Auth
+            .findOneAndUpdate({_id: decoded.userId}, {stage: "additional_information"})
+            .then(()=>{
+                console.log(decoded.userId)
+                const newProfile = new Profile({
+                 _id: decoded.userId,
+                 name: "",
+                 soName: "",
+                 company: "",
+                 description: "",
+                 avatar: 'none'})
+                newProfile.save()
+
+            })
+            .then(res.status(200).json({message: "email confirmed"}))
+            .catch(error=>{
+                res.status(500).json({error: error})
+            })
+
+
+    }
+    else{
+        res.status(500).json({error: "incorrect token"})
+    }
+}
+
+exports.add_info = (req, res) =>{
+    
+}
 
 
 
 
 
-
-/*const newProfile = new Profile(
-    {
-        _id: userId,
-        name: "",
-        soName: "",
-        company: "",
-        description: "",
-        avatar: 'none'
-
-    }) */
 
 
 
