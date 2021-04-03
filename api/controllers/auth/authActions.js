@@ -100,33 +100,41 @@ exports.post_signup_info = (req,res,next) =>{
         })
 }
 
-exports.confirm_email = (req, res) =>{
+exports.confirm_email = async (req, res) =>{
     const decoded = jwt.verify(req.params.confirm_token, 'jerjg')
 
     if(decoded === 'jwt expired'){
         res.status(200).json({message: 'jwt expired'})
     }
     else if(decoded.type === 'registration') {
+
+
         Auth
-            .findOneAndUpdate({_id: decoded.userId}, {stage: "additional_information"})
-            .then(()=>{
-                console.log(decoded.userId)
-                const newProfile = new Profile({
-                 _id: decoded.userId,
-                 name: "",
-                 soName: "",
-                 company: "",
-                 description: "",
-                 avatar: 'none'})
-                newProfile.save()
+            .findOneAndUpdate({_id: decoded.userId, stage: "confirm email"}, {stage: "additional_information"})
+            .exec((err, user) =>{
+                if(err){
+                    res.status(500).json({error: err})
+                }
+                else if(user){
+                    const newProfile = new Profile({
+                        _id: decoded.userId,
+                        name: "",
+                        soName: "",
+                        company: "",
+                        description: "",
+                        avatar: 'none'})
+                    newProfile
+                        .save()
+                        .catch(error=>{
 
+                        })
+
+                    res.status(200).json({message: "email confirmed"})
+                }
+                else{
+                    res.status(400).json({error: "false stage"})
+                }
             })
-            .then(res.status(200).json({message: "email confirmed"}))
-            .catch(error=>{
-                res.status(500).json({error: error})
-            })
-
-
     }
     else{
         res.status(500).json({error: "incorrect token"})
@@ -134,7 +142,42 @@ exports.confirm_email = (req, res) =>{
 }
 
 exports.add_info = (req, res) =>{
-    
+
+    if(req.body.name && req.body.soName && req.body.name.length > 1 && req.body.soName.length >1){
+        Auth
+            .findOneAndUpdate({_id: req.userData.userId, stage: "additional_information"}, {stage: "registered"})
+            .exec((err, user) =>{
+                if(err){
+                    res.status(500).json({error: err})
+                }
+                else if(user){
+                    Profile.findOneAndUpdate({_id: req.userData.userId}, {
+                        name: req.body.name,
+                        soName: req.body.soName,
+                        company: req.body.company || '',
+                        description: req.body.description || ''
+                    }).exec((err, product) =>{
+                        if(err){
+                            res.status(500).json({err: err.message})
+                        }
+                        if(product){
+
+                            res.status(200).json({ message: 'Successfully'})
+
+                        }
+
+                    })
+
+
+                }
+                else{
+                    res.status(400).json({error: "false stage"})
+                }
+            })
+    }
+    else{
+        res.status(400).json({message: "name and soname are required"})
+    }
 }
 
 
