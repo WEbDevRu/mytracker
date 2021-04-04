@@ -11,6 +11,9 @@ router.post('/signup', AuthActions.post_signup_info)
 //Подтверждение почты
 router.put('/confirm_email/:confirm_token', AuthActions.confirm_email)
 
+//Повторная отправка письма
+router.post('/send_message', checkAuth, AuthActions.send_email)
+
 //Дополнительная информация
 router.put('/additional_information', checkAuth, AuthActions.add_info)
 

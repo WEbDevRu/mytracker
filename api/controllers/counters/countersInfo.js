@@ -19,10 +19,9 @@ let getCounterWithUsers = (counters) =>{
         .then(users =>{
 
             countersWithUsers.forEach((counter, counterIndex) =>{
-
+                countersWithUsers[counterIndex].dayusers= 0
                 users.forEach((user)=>{
                     if(counter._id.toString() === user.counterId.toString()){
-                        console.log(countersWithUsers[counterIndex].dayusers)
                         countersWithUsers[counterIndex].dayusers = ++countersWithUsers[counterIndex].dayusers
 
                     }

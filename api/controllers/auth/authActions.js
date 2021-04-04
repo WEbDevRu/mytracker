@@ -69,7 +69,6 @@ exports.post_signup_info = (req,res,next) =>{
                                     }
                                 )
 
-
                                 return await transporter.sendMail({
                                     from: 'noreply@trackyour.site',
                                     to: user.email,
@@ -88,10 +87,6 @@ exports.post_signup_info = (req,res,next) =>{
                                     error: err
                                 })
                             })
-
-
-
-
 
                     }
 
@@ -139,6 +134,53 @@ exports.confirm_email = async (req, res) =>{
     else{
         res.status(500).json({error: "incorrect token"})
     }
+}
+
+exports.send_email =  (req, res) =>{
+    Auth.findOne({_id: req.userData.userId, stage: 'confirm email'})
+        .then(result=>{
+            console.log(result)
+            if(result){
+                let transporter = nodemailer.createTransport({
+                    host: 'mail.jino.ru',
+                    port: 587,
+                    secure: false,
+                    auth: {
+                        user: 'noreply@trackyour.site',
+                        pass: 'wa46067820',
+                    },
+                })
+
+                const token = jwt.sign(
+                    {
+                        userId: req.userData._id,
+                        type: 'registration'
+                    },
+                    'jerjg',
+                    {
+                        expiresIn: '1h'
+                    }
+                )
+
+                transporter.sendMail({
+                    from: '"Трекер регистрация" <noreply@trackyour.site>',
+                    to: req.userData.email,
+                    subject: 'Письмо для подтверждения почты, trackyour.site',
+                    text: 'This message was sent from Node js server.',
+                    html: emailTemplate.regEmail(token)
+                }).then(
+                    res.status(200).json({message: 'mail sent'})
+                ).catch(error=>{
+                    res.status(500).json({error: error})
+                })
+            }
+            else{
+                res.status(400).json({error: "false stage"})
+            }
+
+        })
+
+
 }
 
 exports.add_info = (req, res) =>{
