@@ -27,7 +27,6 @@ let getCounterWithUsers = (counters) =>{
                     }
                 })
             })
-
             return countersWithUsers
         })
 }

@@ -70,10 +70,10 @@ exports.post_signup_info = (req,res,next) =>{
                                 )
 
                                 return await transporter.sendMail({
-                                    from: 'noreply@trackyour.site',
+                                    from: '"Трекер регистрация" <noreply@trackyour.site>',
                                     to: user.email,
-                                    subject: 'trackyour.site Registration',
-                                    text: 'This message was sent from Node js server.',
+                                    subject: 'Письмо для подтверждения почты, trackyour.site',
+                                    text: '',
                                     html: emailTemplate.regEmail(token)
                                 })
                             })
@@ -96,44 +96,57 @@ exports.post_signup_info = (req,res,next) =>{
 }
 
 exports.confirm_email = async (req, res) =>{
-    const decoded = jwt.verify(req.params.confirm_token, 'jerjg')
 
-    if(decoded === 'jwt expired'){
-        res.status(200).json({message: 'jwt expired'})
+    try{
+        const decoded = jwt.verify(req.params.confirm_token, 'jerjg')
+        if(decoded.type === 'registration') {
+
+
+            Auth
+                .findOneAndUpdate({_id: decoded.userId, stage: "confirm email"}, {stage: "additional_information"})
+                .exec((err, user) =>{
+                    if(err){
+                        res.status(500).json({error: err})
+                    }
+                    else if(user){
+                        const newProfile = new Profile({
+                            _id: decoded.userId,
+                            name: "",
+                            soName: "",
+                            company: "",
+                            description: "",
+                            avatar: 'none'})
+                        newProfile
+                            .save()
+                            .catch(error=>{
+
+                            })
+
+                        res.status(200).json({message: "email confirmed"})
+                    }
+                    else{
+                        res.status(400).json({error: "false stage"})
+                    }
+                })
+        }
+        else{
+            res.status(500).json({error: "incorrect token"})
+        }
     }
-    else if(decoded.type === 'registration') {
-
-
-        Auth
-            .findOneAndUpdate({_id: decoded.userId, stage: "confirm email"}, {stage: "additional_information"})
-            .exec((err, user) =>{
-                if(err){
-                    res.status(500).json({error: err})
-                }
-                else if(user){
-                    const newProfile = new Profile({
-                        _id: decoded.userId,
-                        name: "",
-                        soName: "",
-                        company: "",
-                        description: "",
-                        avatar: 'none'})
-                    newProfile
-                        .save()
-                        .catch(error=>{
-
-                        })
-
-                    res.status(200).json({message: "email confirmed"})
-                }
-                else{
-                    res.status(400).json({error: "false stage"})
-                }
-            })
+    catch (err){
+        if(err.message === 'jwt expired'){
+            res.status(200).json({message: 'jwt expired'})
+        }
+        else{
+            res.status(500).json({error: "incorrect token"})
+        }
     }
-    else{
-        res.status(500).json({error: "incorrect token"})
-    }
+
+
+
+
+
+
 }
 
 exports.send_email =  (req, res) =>{
@@ -166,7 +179,7 @@ exports.send_email =  (req, res) =>{
                     from: '"Трекер регистрация" <noreply@trackyour.site>',
                     to: req.userData.email,
                     subject: 'Письмо для подтверждения почты, trackyour.site',
-                    text: 'This message was sent from Node js server.',
+                    text: '',
                     html: emailTemplate.regEmail(token)
                 }).then(
                     res.status(200).json({message: 'mail sent'})
