@@ -9,7 +9,8 @@ const profileSchema = new mongoose.Schema({
     proposals: Array,
     friends: Array,
     newFriends: Array,
-    avatar: {type: String, required: true}
+    avatar: {type: String, required: true},
+    registered: Boolean
 })
 
 module.exports = mongoose.model('profileInfo', profileSchema)

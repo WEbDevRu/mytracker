@@ -115,7 +115,9 @@ exports.confirm_email = async (req, res) =>{
                             soName: "",
                             company: "",
                             description: "",
-                            avatar: 'none'})
+                            avatar: 'none',
+                            registered: false
+                        })
                         newProfile
                             .save()
                             .catch(error=>{
@@ -210,7 +212,8 @@ exports.add_info = (req, res) =>{
                         name: req.body.name,
                         soName: req.body.soName,
                         company: req.body.company || '',
-                        description: req.body.description || ''
+                        description: req.body.description || '',
+                        registered: true
                     }).exec((err, product) =>{
                         if(err){
                             res.status(500).json({err: err.message})

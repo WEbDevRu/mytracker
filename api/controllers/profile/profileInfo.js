@@ -51,6 +51,7 @@ exports.get_profiles_full_list = (async (req,res)=>{
     if(limit > 20){
         limit = 20
     }
+
     const count = await Profile.countDocuments();
     Profile
         .find()
@@ -75,16 +76,15 @@ exports.get_profiles_list = (async (req,res)=>{
     if(limit > 20){
         limit = 20
     }
-    const count = await Profile.countDocuments();
+    const count = await Profile.find({registered: true}).countDocuments();
     Profile
-        .find()
+        .find({registered: true})
         .limit(limit*1)
         .skip((page - 1) * limit)
         .sort({_id:-1})
         .then(docs =>{
             let newdocs = docs.map((doc) => {
                 let friendStatus = undefined
-                console.log(req.userData.userId, doc._id)
                 if (req.userData.userId.toString() === doc._id.toString()){
                     friendStatus = "It is you"
                 }
