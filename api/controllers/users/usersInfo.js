@@ -128,7 +128,7 @@ exports.get_summary_graphic = (req, res)=>{
                         fromTime = Date.now() - 60*60*1000*hour - currentMilleSeconds
                     }
                     let pushGraphicArr = (usersCount) =>{
-                        graphicArr.push({usersCount: usersCount, hour: new Date(fromTime)})
+                        graphicArr.push({usersCount: usersCount, time: new Date(fromTime)})
                     }
 
                     return User
