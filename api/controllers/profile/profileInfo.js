@@ -1,4 +1,7 @@
 const Profile = require('../../models/profile');
+const multer = require('multer')
+const sharp = require('sharp');
+
 exports.get_avatar = (req,res)=>{
     Profile
         .findOne({_id:req.userData.userId})
@@ -100,6 +103,7 @@ exports.get_profiles_list = (async (req,res)=>{
 
                 return {
                     _id: doc._id,
+                    avatar: doc.avatar === "none" ?  "none" : "https://trackyour.site:3443/"+doc.avatar,
                     name: doc.name,
                     soName: doc.soName,
                     company : doc.company,
@@ -128,6 +132,7 @@ exports.get_your_proposals = (req,res)=>{
                 Profile
                     .find({_id: docs.proposals}).then(docs=>{
                     let proposals = docs.map((proposal) => {return {
+                        avatar: proposal.avatar === "none" ?  "none" : "https://trackyour.site:3443/"+proposal.avatar,
                         userId: proposal._id,
                         name: proposal.name,
                         soName: proposal.soName,
@@ -158,6 +163,7 @@ exports.get_friends_list =  (req,res)=>{
                     .find({_id: docs.friends})
                     .then(docs=>{
                     let friends = docs.map((friend) => {return {
+                        avatar: friend.avatar === "none" ?  "none" : "https://trackyour.site:3443/"+friend.avatar,
                         userId: friend._id,
                         name: friend.name,
                         soName: friend.soName,
@@ -178,3 +184,91 @@ exports.get_friends_list =  (req,res)=>{
             }
         })
 }
+
+exports.put_info = (req,res)=> {
+    let newInfo = req.body;
+    Profile
+        .findOneAndUpdate({_id: req.userData.userId}, req.body)
+        .exec((err, product) => {
+            if (err) {
+                return res.status(500).json({err: err.message})
+            } else {
+                if (product) {
+                    res.json({newInfo, message: 'Successfully updated'})
+                } else {
+                    return res.status(500).json({error: "No one find"})
+                }
+
+            }
+
+
+        });
+}
+
+
+const storage = multer.diskStorage({
+
+    destination: (req, file, cb) =>{
+        cb(null, './static/');
+    },
+    filename: (req, file, cb) =>{
+        cb(null, req.userData.userId + '.' + file.originalname.split('.').pop())
+        console.log(file)
+    }
+
+})
+
+const fileFilter = (req, file, cb) =>{
+    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png'){
+
+        cb(null, true)
+    }
+    else {
+        cb(new Error('Only png, jpeg, jpg allowed'))
+    }
+}
+
+
+const upload = multer({
+    storage: storage,
+    limits : {
+        fileSize: 1024*1024*5
+    },
+    fileFilter: fileFilter
+
+}).fields([{
+    name: 'avatarImage',
+    maxCount: 1
+}
+])
+
+exports.upload_avatar = (req, res, next) =>{
+    upload(req,res,(err)=>{
+        if(err){
+            return res.status(400).json({error: err.message})
+        }
+        next()
+    })
+}
+
+exports.store_avatar = (req, res) =>{
+
+    console.log(req.files.avatarImage[0].path)
+
+    sharp(req.files.avatarImage[0].path)
+        .resize({ fit: sharp.fit.cover, width: 300, height: 300 })
+        .toFormat("png")
+        .jpeg({ mozjpeg: true })
+        .toFile('static/'+req.userData.userId+'_min.jpg')
+        .then(
+            Profile
+                .findOneAndUpdate({_id:req.userData.userId}, {avatar: 'https://trackyour.site:3443/static/'+req.userData.userId+'_min.jpg'}))
+        .then(
+            res.status(200).json({message: "avatar uploaded", avatar: 'https://trackyour.site:3443/static/'+req.userData.userId+'_min.jpg'})
+        ).catch(error => res.status(500).json({error: error})
+
+    )
+}
+
+
+

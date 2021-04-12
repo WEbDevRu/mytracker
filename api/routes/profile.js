@@ -4,8 +4,7 @@ const checkAuth = require('../middleware/check-auth')
 const ProfileActions = require('../controllers/profile/profileActions')
 const ProfileInfo = require('../controllers/profile/profileInfo')
 const Profile = require('../models/profile')
-const multer = require('multer')
-const sharp = require('sharp');
+
 
 
 //Отправить заявку на добавления в друзья
@@ -29,95 +28,18 @@ router.delete("/delete_friend/:friendId", checkAuth, ProfileActions.delete_frien
 
 
 
-const storage = multer.diskStorage({
-
-    destination: (req, file, cb) =>{
-        cb(null, './static/');
-    },
-    filename: (req, file, cb) =>{
-        cb(null, req.userData.userId + '.' + file.originalname.split('.').pop())
-        console.log(file)
-    }
-
-})
-
-const fileFilter = (req, file, cb) =>{
-    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png'){
-
-        cb(null, true)
-    }
-    else {
-        cb(new Error('Only png, jpeg, jpg allowed'))
-    }
-}
 
 
-const upload = multer({
-    storage: storage,
-    limits : {
-        fileSize: 1024*1024*5
-    },
-    fileFilter: fileFilter
+// Загрузка аватара
+router.post("/avatar", checkAuth, ProfileInfo.upload_avatar)
 
-}).fields([{
-    name: 'avatarImage',
-    maxCount: 1
-}
-])
-
-router.post("/avatar",  checkAuth, (req, res, next)=>{
-    upload(req,res,(err)=>{
-        if(err){
-            return res.status(400).json({error: err.message})
-        }
-        next()
-    })
-
-
-})
-
-router.post("/avatar", checkAuth,  (req,res)=>{
-    sharp(req.files.avatarImage[0].path)
-        .resize({ fit: sharp.fit.cover, width: 300, height: 300 })
-        .toFormat("jpg")
-        .png({ quality: 100 })
-        .toFile('static/'+req.userData.userId+'_min.jpg')
-        .then(
-            Profile
-                .findOneAndUpdate({_id:req.userData.userId}, {avatar: 'static/'+req.userData.userId+'_min.jpg'}))
-        .then(
-            res.status(200).json({message: "avatar uploaded", avatar: 'static/'+req.userData.userId+'_min.jpg'})
-        ).catch(error => res.status(500).json({error: error})
-
-    )
-})
-
+router.post("/avatar", checkAuth, ProfileInfo.store_avatar)
 
 // Получить аватар
 router.get("/avatar", checkAuth, ProfileInfo.get_avatar)
 
-router.put("/", checkAuth, (req,res)=>{
-    let newInfo = req.body;
-    Profile
-        .findOneAndUpdate({_id:req.userData.userId}, req.body)
-        .exec((err, product) =>{
-            if(err){
-                return res.status(500).json({err: err.message})
-            }
-            else{
-                if(product){
-                    res.json({newInfo, message: 'Successfully updated'})
-                }
-                else{
-                    return res.status(500).json({error: "No one find"})
-                }
-
-            }
-
-
-        });
-})
-
+//Обновление информации о профиле
+router.put("/", checkAuth, ProfileInfo.put_info)
 
 //Получить информацию о своём профиле
 router.get("/", checkAuth, ProfileInfo.get_profile_info)
