@@ -212,7 +212,7 @@ const storage = multer.diskStorage({
         cb(null, './static/');
     },
     filename: (req, file, cb) =>{
-        cb(null, req.userData.userId + '.' + file.originalname.split('.').pop())
+        cb(null, req.userData.userId + '.jpg')
         console.log(file)
     }
 
@@ -253,8 +253,6 @@ exports.upload_avatar = (req, res, next) =>{
 
 exports.store_avatar = (req, res) =>{
 
-    console.log(req.files.avatarImage[0].path)
-
     sharp(req.files.avatarImage[0].path)
         .resize({ fit: sharp.fit.cover, width: 300, height: 300 })
         .toFormat("png")
@@ -262,12 +260,16 @@ exports.store_avatar = (req, res) =>{
         .toFile('static/'+req.userData.userId+'_min.jpg')
         .then(
             Profile
-                .findOneAndUpdate({_id:req.userData.userId}, {avatar: 'https://trackyour.site:3443/static/'+req.userData.userId+'_min.jpg'}))
-        .then(
-            res.status(200).json({message: "avatar uploaded", avatar: 'https://trackyour.site:3443/static/'+req.userData.userId+'_min.jpg'})
-        ).catch(error => res.status(500).json({error: error})
+                .findOneAndUpdate({_id:req.userData.userId}, {avatar: 'static/'+req.userData.userId+'_min.jpg'})
+                .exec((err, avatar) => {
+                    if(err){
+                        res.status(500).json({error: err})
+                    }
+                    else{
+                        res.status(200).json({message: "avatar uploaded", avatar: 'https://trackyour.site:3443/static/'+req.userData.userId+'_min.jpg'})
+                    }
+                }))
 
-    )
 }
 
 
