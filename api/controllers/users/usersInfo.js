@@ -148,10 +148,10 @@ exports.get_summary_graphic = (req, res)=>{
                 Promise.all(arrayOfPromises).then(()=>{
 
                         graphicArr = graphicArr.sort((hour1, hour2)=>{
-                            if (hour1.hour > hour2.hour) {
+                            if (hour1.time > hour2.time) {
                                 return 1;
                             }
-                            if (hour1.hour < hour2.hour) {
+                            if (hour1.time < hour2.time) {
                                 return -1;
                             }
                             return 0
