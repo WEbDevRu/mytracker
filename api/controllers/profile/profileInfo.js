@@ -187,6 +187,10 @@ exports.get_friends_list =  (req,res)=>{
 
 exports.put_info = (req,res)=> {
     let newInfo = req.body;
+    console.log(newInfo.name)
+    if((typeof newInfo.name !== "undefined" && newInfo.name.length < 2) || (typeof newInfo.soName !== "undefined" && newInfo.soName.length < 2)){
+        return res.status(505).json({error: "name and soname are required"})
+    }
     Profile
         .findOneAndUpdate({_id: req.userData.userId}, req.body)
         .exec((err, product) => {
