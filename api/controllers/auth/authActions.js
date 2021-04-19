@@ -7,19 +7,19 @@ const jwt = require('jsonwebtoken')
 const Profile = require('../../models/profile')
 
 exports.post_signup_info = (req,res,next) =>{
-    Auth.find().or([{'email': req.body.email},{'login': req.body.login}])
+    Auth.find().or([{'email': req.body.email.toLowerCase()},{'loginLowCase': req.body.login.toLowerCase()}])
         .exec()
         .then(user =>{
             if(user.length >= 1){
 
                 for(let i = 0; i <= user.length+1; i++){
 
-                    if(user[i].email === req.body.email){
+                    if(user[i].email === req.body.email.toLowerCase()){
                         return res.status(409).json({
                             message: "Mail exists"
                         })
                     }
-                    else if (user[i].login === req.body.login){
+                    else if (user[i].login.toString().toLowerCase() === req.body.login.toString().toLowerCase()){
                         return res.status(409).json({
                             message: "Login exists"
                         })
@@ -39,8 +39,9 @@ exports.post_signup_info = (req,res,next) =>{
                         const userId = mongoose.Types.ObjectId();
                         const profile = new Auth({
                             _id: userId,
-                            email: req.body.email,
+                            email: req.body.email.toLowerCase(),
                             login: req.body.login,
+                            loginLowCase: req.body.login.toLowerCase(),
                             regDate: new Date(),
                             password: hash,
                             stage: 'confirm email'

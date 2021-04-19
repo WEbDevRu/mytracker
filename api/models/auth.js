@@ -14,6 +14,11 @@ const authSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    loginLowCase:{
+        type: String,
+        required: true,
+        unique: true
+    },
     password: {
         type:String,
         required: true,

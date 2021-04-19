@@ -58,7 +58,6 @@ exports.get_profile_users = (req,res)=>{
     Counter.find({profileId: req.userData.userId}).then(docs=>{
 
         if(docs.length > 0){
-
             let countersId = docs.map((counter)=>(counter._id))
             User
                 .find({counterId: countersId})
@@ -84,7 +83,7 @@ exports.get_profile_users = (req,res)=>{
                         res.status(200).json({usersPage, totalDocs: docs.length, currentPage: page})
                     }
                     else{
-                        res.status(200).json({users: "no users"})
+                        res.status(200).json({message: "no users"})
                     }
 
                 })
