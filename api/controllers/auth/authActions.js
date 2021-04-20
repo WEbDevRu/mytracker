@@ -256,7 +256,7 @@ exports.add_info = (req, res) =>{
 
 
 exports.post_login_info = (req, res, next) => {
-    Auth.find({email: req.body.email})
+    Auth.find({email: req.body.email.toLowerCase()})
         .exec()
         .then(user=>{
             if(user.length < 1){
